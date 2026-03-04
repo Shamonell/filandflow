@@ -1,0 +1,42 @@
+{
+  "name": "fil-et-flow",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "sanity": "cd sanity && npm run dev",
+    "sanity:build": "cd sanity && npm run build",
+    "sanity:deploy": "cd sanity && npm run deploy"
+  },
+  "dependencies": {
+    "@sanity/client": "^6.12.0",
+    "@sanity/icons": "^3.0.0",
+    "@sanity/image-url": "^1.0.2",
+    "@sanity/vision": "^3.0.0",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.3.0",
+    "next": "14.2.33",
+    "next-sanity": "10.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "resend": "^3.2.0",
+    "sanity": "4.14.2",
+    "stripe": "^20.3.1",
+    "styled-components": "^6.3.11",
+    "tailwind-merge": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.4.0"
+  }
+}

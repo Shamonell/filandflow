@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: #1F2933;
+  background: #FBF8F3;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  /* Typographie éditoriale : titres serif */
+  h1 {
+    font-family: var(--font-serif), serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-family: var(--font-serif), serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-family: var(--font-serif), serif;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.3;
+  }
+
+  /* Override pour les classes font-light sur les titres : garder serif mais avec poids plus léger */
+  h1.font-light,
+  h2.font-light,
+  h3.font-light {
+    font-weight: 400;
+  }
+}
+
+@layer components {
+  /* Container standard éditorial */
+  .container-editorial {
+    @apply mx-auto max-w-5xl px-4;
+  }
+
+  /* Sections avec respiration */
+  .section-editorial {
+    @apply py-16 md:py-20;
+  }
+
+  .section-editorial-sm {
+    @apply py-12 md:py-16;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+
