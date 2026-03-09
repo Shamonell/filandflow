@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Image from "next/image";
 import ContactButton from "@/components/ui/ContactButton";
 import { GIFT_CARDS } from "@/lib/gift-cards";
 import GiftCardImage from "@/components/bons-cadeaux/GiftCardImage";
@@ -17,9 +18,11 @@ export default function BonsCadeauxPage() {
           {/* Hero */}
           <div className="mb-12 text-center">
             <div className="mx-auto flex justify-center px-4">
-              <img
+              <Image
                 src="/bon cadeau.PNG"
                 alt=""
+                width={420}
+                height={280}
                 className="h-auto w-full max-w-[200px] object-contain sm:max-w-[280px] md:max-w-[360px] lg:max-w-[420px]"
                 aria-hidden
               />
@@ -55,11 +58,13 @@ export default function BonsCadeauxPage() {
             <div className="space-y-6 text-gray-700">
               <div className="flex gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center md:h-20 md:w-20">
-                  <img
+                  <Image
                     src="/icone lettre coeur.PNG"
                     alt=""
+                    width={64}
+                    height={64}
                     className="h-14 w-14 object-contain md:h-16 md:w-16"
-                    aria-hidden="true"
+                    aria-hidden
                   />
                 </div>
                 <div>
@@ -72,11 +77,13 @@ export default function BonsCadeauxPage() {
               </div>
               <div className="flex gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center md:h-20 md:w-20">
-                  <img
+                  <Image
                     src="/icone livraison.png"
                     alt=""
+                    width={64}
+                    height={64}
                     className="h-14 w-14 object-contain md:h-16 md:w-16"
-                    aria-hidden="true"
+                    aria-hidden
                   />
                 </div>
                 <div>
@@ -89,11 +96,13 @@ export default function BonsCadeauxPage() {
               </div>
               <div className="flex gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center md:h-20 md:w-20">
-                  <img
+                  <Image
                     src="/icone calendrier.PNG"
                     alt=""
+                    width={64}
+                    height={64}
                     className="h-14 w-14 object-contain md:h-16 md:w-16"
-                    aria-hidden="true"
+                    aria-hidden
                   />
                 </div>
                 <div>
@@ -106,11 +115,13 @@ export default function BonsCadeauxPage() {
               </div>
               <div className="flex gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center md:h-20 md:w-20">
-                  <img
+                  <Image
                     src="/sablier.PNG"
                     alt=""
+                    width={64}
+                    height={64}
                     className="h-14 w-14 object-contain md:h-16 md:w-16"
-                    aria-hidden="true"
+                    aria-hidden
                   />
                 </div>
                 <div>
@@ -127,11 +138,13 @@ export default function BonsCadeauxPage() {
           {/* Contact */}
           <section className="rounded-lg bg-beige-50 p-8 text-center md:p-10">
             <div className="mb-4 flex justify-center">
-              <img
+              <Image
                 src="/icone lettre coeur.PNG"
                 alt=""
+                width={96}
+                height={96}
                 className="h-20 w-20 object-contain opacity-90 md:h-24 md:w-24"
-                aria-hidden="true"
+                aria-hidden
               />
             </div>
             <h2 className="mb-4 text-2xl font-light text-gray-900 md:text-3xl">

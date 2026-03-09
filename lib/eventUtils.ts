@@ -1,5 +1,18 @@
 import { Event } from "./queries";
 
+/** Données affichées pour une session (fusion template + event) */
+export function getEventDisplayInfo(event: Event) {
+  const t = event.template;
+  return {
+    title: t?.title ?? event.title ?? "Atelier",
+    description: t?.description ?? event.description ?? null,
+    images: t?.images ?? [],
+    duration: event.duration ?? t?.defaultDuration ?? null,
+    location: event.location ?? t?.defaultLocation ?? null,
+    sessionDescription: event.sessionDescription ?? null,
+  };
+}
+
 /**
  * Calcule le nombre de places restantes pour un atelier
  */

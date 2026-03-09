@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Image from "next/image";
 import ContactButton from "@/components/ui/ContactButton";
 
 export const metadata: Metadata = {
@@ -17,10 +18,12 @@ export default function AProposPage() {
               {/* Photo d'Elisabeth */}
               <div className="relative h-64 w-64 flex-shrink-0 md:h-80 md:w-80">
                 <div className="relative h-full w-full overflow-hidden rounded-full shadow-xl ring-4 ring-[#EEF4EE]">
-                  <img
+                  <Image
                     src="/photo elizabethe.PNG"
                     alt="Elisabeth - Créatrice de Fil & Flow"
-                    className="h-full w-full object-cover object-center"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 256px, 320px"
                   />
                 </div>
               </div>
@@ -106,7 +109,7 @@ export default function AProposPage() {
               {/* Carte Retraitée */}
               <div className="group rounded-2xl bg-white p-8 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 <div className="mb-4 flex justify-center">
-                  <img src="/illustration-retraitee.PNG" alt="" className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
+                  <Image src="/illustration-retraitee.PNG" alt="" width={80} height={80} className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
                 </div>
                 <h3 className="mb-4 text-2xl font-medium text-[#5C3A21]">
                   Vous êtes retraitée
@@ -125,7 +128,7 @@ export default function AProposPage() {
               {/* Carte Étudiante */}
               <div className="group rounded-2xl bg-white p-8 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 <div className="mb-4 flex justify-center">
-                  <img src="/illustration-etudiante.PNG" alt="" className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
+                  <Image src="/illustration-etudiante.PNG" alt="" width={80} height={80} className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
                 </div>
                 <h3 className="mb-4 text-2xl font-medium text-[#5C3A21]">
                   Vous êtes étudiante
@@ -144,7 +147,7 @@ export default function AProposPage() {
               {/* Carte Mère au foyer */}
               <div className="group rounded-2xl bg-white p-8 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 <div className="mb-4 flex justify-center">
-                  <img src="/illustration-mere-foyer.PNG" alt="" className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
+                  <Image src="/illustration-mere-foyer.PNG" alt="" width={80} height={80} className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
                 </div>
                 <h3 className="mb-4 text-2xl font-medium text-[#5C3A21]">
                   Vous êtes mère au foyer
@@ -162,7 +165,7 @@ export default function AProposPage() {
               {/* Carte Responsable résidence seniors */}
               <div className="group rounded-2xl bg-white p-8 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 <div className="mb-4 flex justify-center">
-                  <img src="/illustration-residence-seniors.PNG" alt="" className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
+                  <Image src="/illustration-residence-seniors.PNG" alt="" width={80} height={80} className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
                 </div>
                 <h3 className="mb-4 text-2xl font-medium text-[#5C3A21]">
                   Responsable en résidence seniors
@@ -180,7 +183,7 @@ export default function AProposPage() {
               {/* Carte Assistante RH */}
               <div className="group rounded-2xl bg-white p-8 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 md:col-span-2 lg:col-span-1">
                 <div className="mb-4 flex justify-center">
-                  <img src="/illustration-assistante-rh.PNG" alt="" className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
+                  <Image src="/illustration-assistante-rh.PNG" alt="" width={80} height={80} className="h-16 w-16 object-contain md:h-20 md:w-20" aria-hidden />
                 </div>
                 <h3 className="mb-4 text-2xl font-medium text-[#5C3A21]">
                   Assistante RH

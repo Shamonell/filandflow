@@ -27,10 +27,19 @@ export const productBySlugQuery = groq`
   }
 `;
 
-// Query pour récupérer tous les événements/ateliers (uniquement les documents publiés)
+// Query pour récupérer tous les événements/ateliers (avec type d'atelier développé)
 export const eventsQuery = groq`
   *[_type == "event" && !(_id in path("drafts.**"))] | order(dateStart asc) {
     _id,
+    "template": template->{
+      _id,
+      title,
+      slug,
+      description,
+      images,
+      defaultDuration,
+      defaultLocation
+    },
     title,
     slug,
     dateStart,
@@ -39,15 +48,38 @@ export const eventsQuery = groq`
     price,
     capacity,
     bookedPlaces,
+    sessionDescription,
     description,
     status
   }
 `;
 
-// Query pour récupérer un événement par slug (uniquement les documents publiés)
-export const eventBySlugQuery = groq`
-  *[_type == "event" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
+// Query pour récupérer un type d'atelier par slug
+export const templateBySlugQuery = groq`
+  *[_type == "workshopTemplate" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
     _id,
+    title,
+    slug,
+    description,
+    images,
+    defaultDuration,
+    defaultLocation
+  }
+`;
+
+// Query pour récupérer les événements d'un type d'atelier donné (par slug du template)
+export const eventsByTemplateSlugQuery = groq`
+  *[_type == "event" && template->slug.current == $templateSlug && !(_id in path("drafts.**"))] | order(dateStart asc) {
+    _id,
+    "template": template->{
+      _id,
+      title,
+      slug,
+      description,
+      images,
+      defaultDuration,
+      defaultLocation
+    },
     title,
     slug,
     dateStart,
@@ -56,6 +88,34 @@ export const eventBySlugQuery = groq`
     price,
     capacity,
     bookedPlaces,
+    sessionDescription,
+    description,
+    status
+  }
+`;
+
+// Query pour récupérer un événement par slug (avec type d'atelier développé)
+export const eventBySlugQuery = groq`
+  *[_type == "event" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
+    _id,
+    "template": template->{
+      _id,
+      title,
+      slug,
+      description,
+      images,
+      defaultDuration,
+      defaultLocation
+    },
+    title,
+    slug,
+    dateStart,
+    duration,
+    location,
+    price,
+    capacity,
+    bookedPlaces,
+    sessionDescription,
     description,
     status
   }
@@ -72,17 +132,29 @@ export interface Product {
   status: "disponible" | "réservé" | "vendu";
 }
 
-export interface Event {
+export interface WorkshopTemplate {
   _id: string;
   title: string;
   slug: { current: string };
+  description: string | null;
+  images?: Array<{ _key?: string; asset?: { _ref?: string }; [key: string]: unknown }>;
+  defaultDuration?: string | null;
+  defaultLocation?: string | null;
+}
+
+export interface Event {
+  _id: string;
+  template?: WorkshopTemplate | null;
+  title?: string | null;
+  description?: string | null;
+  slug: { current: string };
   dateStart: string;
-  duration: string;
-  location: string;
-  price?: number;
-  capacity?: number;
-  bookedPlaces?: number;
-  description: any;
+  duration?: string | null;
+  location?: string | null;
+  price?: number | null;
+  capacity?: number | null;
+  bookedPlaces?: number | null;
+  sessionDescription?: string | null;
   status: "ouvert" | "complet" | "passé";
 }
 
@@ -101,6 +173,18 @@ export async function getEvents(): Promise<Event[]> {
 
 export async function getEventBySlug(slug: string): Promise<Event | null> {
   return await client.fetch(eventBySlugQuery, { slug });
+}
+
+export async function getTemplateBySlug(
+  slug: string
+): Promise<WorkshopTemplate | null> {
+  return await client.fetch(templateBySlugQuery, { slug });
+}
+
+export async function getEventsByTemplateSlug(
+  templateSlug: string
+): Promise<Event[]> {
+  return await client.fetch(eventsByTemplateSlugQuery, { templateSlug });
 }
 
 

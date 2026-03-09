@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import Button from "@/components/ui/Button";
 import WorkshopCard from "@/components/ateliers-chez-vous/WorkshopCard";
 import ConceptFeature from "@/components/ateliers-chez-vous/ConceptFeature";
@@ -57,9 +58,11 @@ export default function AteliersChezVousPage() {
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               <ConceptFeature
                 icon={
-                  <img
+                  <Image
                     src="/tout materiel fourni.png"
                     alt=""
+                    width={112}
+                    height={112}
                     className="h-24 w-24 object-contain md:h-28 md:w-28"
                     aria-hidden
                   />
@@ -69,9 +72,11 @@ export default function AteliersChezVousPage() {
               />
               <ConceptFeature
                 icon={
-                  <img
+                  <Image
                     src="/petits groupes.png"
                     alt=""
+                    width={112}
+                    height={112}
                     className="h-24 w-24 object-contain md:h-28 md:w-28"
                     aria-hidden
                   />
@@ -306,9 +311,11 @@ export default function AteliersChezVousPage() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-6 flex justify-center">
-              <img
+              <Image
                 src="/icone calendrier.PNG"
                 alt=""
+                width={96}
+                height={96}
                 className="h-20 w-20 object-contain md:h-24 md:w-24"
                 aria-hidden
               />

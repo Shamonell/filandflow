@@ -2,6 +2,7 @@
 
 import { useState, FormEvent, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import Button from "@/components/ui/Button";
 
 function ContactForm() {
@@ -85,10 +86,12 @@ function ContactForm() {
               {/* Photo d'Elisabeth */}
               <div className="flex-shrink-0 lg:w-1/3">
                 <div className="relative h-64 w-full overflow-hidden rounded-2xl shadow-lg md:h-80 lg:h-96">
-                  <img
+                  <Image
                     src="/photo elizabethe.PNG"
                     alt="Elisabeth - Fil & Flow"
-                    className="h-full w-full object-cover object-center"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#6F8F72]/10 to-transparent" />
                 </div>

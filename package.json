@@ -9,7 +9,8 @@
     "lint": "next lint",
     "sanity": "cd sanity && npm run dev",
     "sanity:build": "cd sanity && npm run build",
-    "sanity:deploy": "cd sanity && npm run deploy"
+    "sanity:deploy": "cd sanity && npm run deploy",
+    "seed:templates": "npx tsx scripts/seed-workshop-templates.ts"
   },
   "dependencies": {
     "@sanity/client": "^6.12.0",
@@ -33,6 +34,7 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.17",
+    "dotenv": "^17.3.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.0",
     "postcss": "^8.4.33",

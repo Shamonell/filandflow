@@ -57,7 +57,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const mainImage = product.images?.[0];
   const imageUrl = mainImage
-    ? urlFor(mainImage).width(800).height(800).url()
+    ? urlFor(mainImage).width(800).height(800).format("webp").url()
     : null;
 
   const statusColors = {
@@ -104,7 +104,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           {product.images && product.images.length > 1 && (
             <div className="grid grid-cols-4 gap-4">
               {product.images.slice(1, 5).map((image, index) => {
-                const thumbUrl = urlFor(image).width(200).height(200).url();
+                const thumbUrl = urlFor(image).width(200).height(200).format("webp").url();
                 return (
                   <div
                     key={index}
@@ -168,23 +168,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </CheckoutButton>
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="flex w-full items-center justify-center gap-3">
-                  <img
-                    src="/icone whatapp.PNG"
-                    alt=""
-                    className="h-5 w-5 object-contain"
-                    aria-hidden="true"
-                  />
+                  <Image src="/icone whatapp.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
                   Contacter par WhatsApp
                 </Button>
               </a>
               <a href={emailUrl}>
                 <Button variant="outline" className="flex w-full items-center justify-center gap-3">
-                  <img
-                    src="/icone lettre coeur.PNG"
-                    alt=""
-                    className="h-5 w-5 object-contain"
-                    aria-hidden="true"
-                  />
+                  <Image src="/icone lettre coeur.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
                   Envoyer un e-mail
                 </Button>
               </a>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface GiftCardImageProps {
   cardId: string;
@@ -46,11 +47,13 @@ export default function GiftCardImage({
       onClick={handleClick}
       className="group relative cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.01]"
     >
-      <div className="relative w-full overflow-hidden">
-        <img
+      <div className="relative w-full overflow-hidden aspect-[4/3]">
+        <Image
           src={image}
           alt={name}
-          className="h-auto w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+          fill
+          className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">

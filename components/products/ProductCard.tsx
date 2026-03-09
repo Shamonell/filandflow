@@ -11,7 +11,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const mainImage = product.images?.[0];
   const imageUrl = mainImage 
-    ? urlFor(mainImage).width(400).height(400).url() 
+    ? urlFor(mainImage).width(400).height(400).format("webp").url() 
     : null;
 
   const statusColors = {

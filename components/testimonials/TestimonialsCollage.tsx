@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 interface Testimonial {
   name: string;
@@ -139,11 +140,13 @@ export default function TestimonialsCollage() {
           <div className="mb-16 text-center">
             {/* Illustration de la bulle de parole */}
             <div className="mb-8 flex justify-center">
-              <img
+              <Image
                 src="/Bulle de parole.png"
                 alt=""
+                width={192}
+                height={192}
                 className="h-36 w-36 object-contain md:h-40 md:w-40 lg:h-48 lg:w-48"
-                aria-hidden="true"
+                aria-hidden
               />
             </div>
 

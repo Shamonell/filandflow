@@ -8,16 +8,16 @@ interface GalleryImage {
   alt: string;
 }
 
-// Liste des images placeholder attendues
-const PLACEHOLDER_IMAGES = [
-  { src: "/galerie/g1.jpg", alt: "Réalisation 1" },
-  { src: "/galerie/g2.jpg", alt: "Réalisation 2" },
-  { src: "/galerie/g3.jpg", alt: "Réalisation 3" },
-  { src: "/galerie/g4.jpg", alt: "Réalisation 4" },
-  { src: "/galerie/g5.jpg", alt: "Réalisation 5" },
-  { src: "/galerie/g6.jpg", alt: "Réalisation 6" },
-  { src: "/galerie/g7.jpg", alt: "Réalisation 7" },
-  { src: "/galerie/g8.jpg", alt: "Réalisation 8" },
+// 8 photos de la galerie (noms réels dans public/) : pochette1, pochette2, sacoche6, sacoche5, sac1, tissagepapier, bracelet, sacoche4
+const GALLERY_IMAGES = [
+  { src: "/pochette1.jpg", alt: "Pochette - réalisation Fil & Flow" },
+  { src: "/pochette2.jpg", alt: "Pochette - réalisation Fil & Flow" },
+  { src: "/sacoche6.jpg", alt: "Sacoche - réalisation Fil & Flow" },
+  { src: "/sacoche5.jpg", alt: "Sacoche - réalisation Fil & Flow" },
+  { src: "/sac1.jpg", alt: "Sac - réalisation Fil & Flow" },
+  { src: "/tissagepapier.jpg", alt: "Tissage papier - réalisation Fil & Flow" },
+  { src: "/bracelet.jpg", alt: "Bracelet - réalisation Fil & Flow" },
+  { src: "/sacoche4.jpg", alt: "Sacoche - réalisation Fil & Flow" },
 ];
 
 function GalleryImageItem({ image, index }: { image: GalleryImage; index: number }) {
@@ -78,7 +78,7 @@ export default function GalleryGrid() {
 
           {/* Grille d'images */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-            {PLACEHOLDER_IMAGES.map((image, index) => (
+            {GALLERY_IMAGES.map((image, index) => (
               <GalleryImageItem key={index} image={image} index={index} />
             ))}
           </div>

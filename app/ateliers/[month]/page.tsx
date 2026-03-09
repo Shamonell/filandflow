@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { getEvents, Event } from "@/lib/queries";
 import EventCard from "@/components/events/EventCard";
 import ContactButton from "@/components/ui/ContactButton";
@@ -149,10 +150,13 @@ export default async function MonthPage({ params }: MonthPageProps) {
       {/* Image du mois en hero */}
       <section className="relative overflow-hidden -mt-28 md:-mt-36">
         <div className="relative h-64 w-full md:h-80 lg:h-96 pt-28 md:pt-36">
-          <img
+          <Image
             src={monthImage}
             alt={`Ateliers de ${displayMonth}`}
-            className="h-full w-full object-cover object-top"
+            fill
+            className="object-cover object-top"
+            sizes="100vw"
+            priority
           />
           {/* Overlay gradient subtil pour lisibilité */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />

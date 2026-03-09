@@ -53,23 +53,23 @@ export default function EventCard({ event }: EventCardProps) {
             </div>
           </div>
 
-          {/* Titre */}
+          {/* Titre (template ou ancien champ) */}
           <h3 className="mb-4 text-lg font-medium text-gray-900">
-            {event.title}
+            {event.template?.title ?? event.title ?? "Atelier"}
           </h3>
 
           {/* 2 infos principales */}
           <div className="mb-4 space-y-2 text-sm text-gray-700">
-            {event.duration && (
+            {(event.duration ?? event.template?.defaultDuration) && (
               <div className="flex items-center gap-2">
                 <span className="text-gray-400">⏱</span>
-                <span>{event.duration}</span>
+                <span>{event.duration ?? event.template?.defaultDuration}</span>
               </div>
             )}
-            {event.location && (
+            {(event.location ?? event.template?.defaultLocation) && (
               <div className="flex items-center gap-2">
                 <span className="text-gray-400">📍</span>
-                <span>{event.location}</span>
+                <span>{event.location ?? event.template?.defaultLocation}</span>
               </div>
             )}
           </div>

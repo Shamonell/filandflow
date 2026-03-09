@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Button from "@/components/ui/Button";
 import GalleryGrid from "@/components/gallery/GalleryGrid";
 import TestimonialsCollage from "@/components/testimonials/TestimonialsCollage";
@@ -27,13 +28,14 @@ export default async function Home() {
           <div className="mx-auto max-w-4xl text-center">
             {/* Fond stylé avec image personnalisée */}
             <div className="mx-auto max-w-3xl">
-              {/* Option C: image en <img> (pas de crop), texte par-dessus */}
               <div className="relative">
-                <img
+                <Image
                   src="/fond texte acceuil.png"
                   alt=""
-                  aria-hidden="true"
+                  width={960}
+                  height={540}
                   className="h-auto w-full select-none"
+                  priority
                 />
                 <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12 lg:p-16">
                   <div className="w-full">
@@ -68,9 +70,11 @@ export default async function Home() {
               {/* Carte 1 : Des ateliers guidés */}
               <div className="group rounded-lg bg-white px-16 py-8 shadow-sm">
                 <div className="mb-4 flex justify-center">
-                  <img
+                  <Image
                     src="/atelier guidé.png"
                     alt="Illustration d'un accompagnement créatif pas à pas"
+                    width={280}
+                    height={180}
                     className="h-[140px] w-[200px] object-contain transition-all duration-600 ease-in-out sm:h-[160px] sm:w-[240px] lg:h-[180px] lg:w-[280px] group-hover:-translate-y-0.5 group-hover:opacity-[1.03]"
                   />
                 </div>
@@ -87,9 +91,11 @@ export default async function Home() {
               {/* Carte 2 : Petits groupes */}
               <div className="group rounded-lg bg-white px-16 py-8 shadow-sm">
                 <div className="mb-4 flex justify-center">
-                  <img
+                  <Image
                     src="/petits groupes.png"
                     alt="Illustration représentant un petit groupe bienveillant"
+                    width={280}
+                    height={180}
                     className="h-[140px] w-[200px] object-contain transition-all duration-600 ease-in-out sm:h-[160px] sm:w-[240px] lg:h-[180px] lg:w-[280px] group-hover:-translate-y-0.5 group-hover:opacity-[1.03]"
                   />
                 </div>
@@ -106,9 +112,11 @@ export default async function Home() {
               {/* Carte 3 : Tout le matériel fourni */}
               <div className="group rounded-lg bg-white px-16 py-8 shadow-sm">
                 <div className="mb-4 flex justify-center">
-                  <img
+                  <Image
                     src="/tout materiel fourni.png"
                     alt="Illustration du matériel créatif prêt à l'emploi"
+                    width={280}
+                    height={180}
                     className="h-[140px] w-[200px] object-contain transition-all duration-600 ease-in-out sm:h-[160px] sm:w-[240px] lg:h-[180px] lg:w-[280px] group-hover:-translate-y-0.5 group-hover:opacity-[1.03]"
                   />
                 </div>
@@ -125,9 +133,11 @@ export default async function Home() {
               {/* Carte 4 : Sans pression */}
               <div className="group rounded-lg bg-white px-16 py-8 shadow-sm">
                 <div className="mb-4 flex justify-center">
-                  <img
+                  <Image
                     src="/sans pression.png"
                     alt="Illustration évoquant la création sans pression"
+                    width={280}
+                    height={180}
                     className="h-[140px] w-[200px] object-contain transition-all duration-600 ease-in-out sm:h-[160px] sm:w-[240px] lg:h-[180px] lg:w-[280px] group-hover:-translate-y-0.5 group-hover:opacity-[1.03]"
                   />
                 </div>
@@ -186,10 +196,12 @@ export default async function Home() {
                 {/* Photo d'Elisabeth */}
                 <div className="relative h-80 w-full md:h-auto md:w-1/3 lg:w-2/5">
                   <div className="relative h-full w-full overflow-hidden">
-                    <img
+                    <Image
                       src="/photo elizabethe.PNG"
                       alt="Elisabeth - Créatrice de Fil & Flow"
-                      className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
+                      fill
+                      className="object-cover object-center transition-transform duration-500 hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 33vw"
                     />
                     {/* Overlay subtil pour plus de profondeur */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#6F8F72]/5 via-transparent to-transparent" />

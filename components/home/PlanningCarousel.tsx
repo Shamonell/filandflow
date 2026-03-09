@@ -7,13 +7,33 @@ import Link from "next/link";
 interface Slide {
   src: string;
   alt: string;
+  title: string;
+  buttonLabel: string;
+  href: string;
 }
 
-// Images placeholder - à remplacer par les vraies images
 const slides: Slide[] = [
-  { src: "/carousel/slide1.jpg", alt: "Atelier créatif - moment de partage" },
-  { src: "/carousel/slide2.jpg", alt: "Atelier créatif - création textile" },
-  { src: "/carousel/slide3.jpg", alt: "Atelier créatif - ambiance chaleureuse" },
+  {
+    src: "/atelier1.jpg",
+    alt: "Planning des ateliers Fil & Flow",
+    title: "Le planning des ateliers",
+    buttonLabel: "C'est quoi le planning ?",
+    href: "/ateliers",
+  },
+  {
+    src: "/atelier2.jpg",
+    alt: "Boutique Fil & Flow",
+    title: "La boutique Fil & Flow",
+    buttonLabel: "Découvrir la boutique",
+    href: "/boutique",
+  },
+  {
+    src: "/image atelier chez vous.PNG",
+    alt: "Parenthèses à la maison - ateliers à domicile",
+    title: "Parenthèses à la maison",
+    buttonLabel: "En savoir plus",
+    href: "/ateliers-chez-vous",
+  },
 ];
 
 export default function PlanningCarousel() {
@@ -86,20 +106,20 @@ export default function PlanningCarousel() {
               </div>
             ))}
 
-            {/* Contenu texte + bouton par-dessus */}
+            {/* Contenu texte + bouton par-dessus (selon le slide) */}
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-end pb-10 md:pb-14">
               <h2
                 className="mb-4 text-center text-3xl font-light text-white md:text-4xl lg:text-5xl"
                 style={{ textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}
               >
-                Le planning des ateliers
+                {slides[currentIndex].title}
               </h2>
-              <Link href="/ateliers">
+              <Link href={slides[currentIndex].href}>
                 <button
                   className="rounded-full bg-white/90 px-6 py-3 text-sm font-medium text-[#5C3A21] shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:shadow-xl md:px-8 md:py-4 md:text-base"
-                  aria-label="Accéder au planning des ateliers"
+                  aria-label={slides[currentIndex].buttonLabel}
                 >
-                  C&apos;est quoi le planning ?
+                  {slides[currentIndex].buttonLabel}
                 </button>
               </Link>
             </div>
