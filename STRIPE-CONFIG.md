@@ -33,6 +33,16 @@
 | Webhook : produit → « vendu » dans Sanity | OK |
 | Email à toi (client, adresse, montant, produit) | OK (si ORDER_EMAIL + RESEND_API_KEY) |
 | Statut « En demande » (WhatsApp) | OK — à mettre manuellement dans Sanity |
+| Email de confirmation au client | OK |
+
+---
+
+## Quand Stripe confirme le paiement → « vendu » automatique ?
+
+**Oui.** Dès que Stripe envoie l’événement `checkout.session.completed` (paiement réussi), le webhook :
+1. Met le produit en **« vendu »** dans Sanity
+2. Envoie un email à toi (ORDER_EMAIL) avec les détails
+3. Envoie un email de confirmation au client
 
 ---
 
@@ -43,8 +53,3 @@
 - **Réservé** : réservé, en attente
 - **Vendu** : mis automatiquement par le webhook après paiement Stripe
 
----
-
-## Email de confirmation au client
-
-Pour envoyer un email de confirmation au client après achat, il faudrait l'ajouter dans le webhook (envoi via Resend au `customer_details.email`). Dis-moi si tu veux que je le fasse.

@@ -53,6 +53,41 @@ async function sendOrderEmailToSeller(params: {
   }
 }
 
+async function sendConfirmationEmailToCustomer(params: {
+  customerEmail: string;
+  productName: string;
+  amount: number;
+}) {
+  const { customerEmail, productName, amount } = params;
+  const resendKey = process.env.RESEND_API_KEY;
+
+  if (!resendKey || !customerEmail || customerEmail === "Non fourni") {
+    return;
+  }
+
+  try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(resendKey);
+
+    await resend.emails.send({
+      from: "Fil & Flow <onboarding@resend.dev>",
+      to: customerEmail,
+      subject: `Confirmation de votre achat - ${productName}`,
+      html: `
+        <h2>Merci pour votre achat !</h2>
+        <p>Bonjour,</p>
+        <p>Nous avons bien reçu votre paiement pour <strong>${productName}</strong>.</p>
+        <p><strong>Montant :</strong> ${(amount / 100).toFixed(2)} €</p>
+        <p>Votre commande sera expédiée dans les meilleurs délais.</p>
+        <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+        <p>À bientôt,<br>L'équipe Fil & Flow</p>
+      `,
+    });
+  } catch (err) {
+    console.error("Erreur envoi email confirmation client:", err);
+  }
+}
+
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const metadata = session.metadata;
   if (!metadata) return;
@@ -69,12 +104,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const customerName = session.customer_details?.name ?? null;
     const address = formatAddress(session);
 
+    const productName = metadata.productTitle || metadata.productSlug || "Produit";
+
     await sendOrderEmailToSeller({
-      productName: metadata.productTitle || metadata.productSlug || "Produit",
+      productName,
       amount,
       customerEmail,
       customerName,
       address,
+    });
+
+    await sendConfirmationEmailToCustomer({
+      customerEmail,
+      productName,
+      amount,
     });
   }
 }
