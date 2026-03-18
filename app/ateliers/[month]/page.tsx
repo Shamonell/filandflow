@@ -12,7 +12,7 @@ interface MonthPageProps {
   params: { month: string };
 }
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 // Génère tous les mois possibles pour l'export statique
 export async function generateStaticParams() {

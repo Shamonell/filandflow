@@ -29,14 +29,10 @@ export default function WorkshopTypePage({
       <div className="bg-[#FBF8F3] py-16">
         <div className="container mx-auto max-w-2xl px-4 text-center">
           <h1 className="mb-4 font-serif text-2xl text-[#5C3A21]">
-            Type d&apos;atelier non trouvé
+            Page non disponible
           </h1>
           <p className="mb-6 text-[#5F6C72]">
-            Ce type d&apos;atelier n&apos;existe pas encore dans Sanity. Exécutez{" "}
-            <code className="rounded bg-[#EEF4EE] px-2 py-1 text-sm">
-              npm run seed:templates
-            </code>{" "}
-            pour créer les 7 types (Couture, Broderie, etc.).
+            Cette page n&apos;est pas disponible pour le moment.
           </p>
           <Link
             href="/ateliers"
@@ -85,9 +81,6 @@ export default function WorkshopTypePage({
             <h1 className="font-serif text-3xl font-light text-[#5C3A21] md:text-4xl">
               {template.title}
             </h1>
-            <p className="mt-2 text-sm text-[#5F6C72]">
-              Ajoutez une image dans Sanity (Type d&apos;atelier → {template.title} → Images)
-            </p>
           </div>
         </section>
       )}
@@ -149,9 +142,6 @@ export default function WorkshopTypePage({
             <div className="rounded-2xl border border-beige-200 bg-white p-8 text-center">
               <p className="text-[#5F6C72]">
                 Aucune session prévue pour le moment.
-              </p>
-              <p className="mt-2 text-sm text-[#5F6C72]">
-                Créez un événement dans Sanity et associez-le au type &quot;{template.title}&quot;.
               </p>
               <Link
                 href="/ateliers"

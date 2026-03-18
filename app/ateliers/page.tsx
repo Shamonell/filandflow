@@ -5,8 +5,8 @@ import MonthCard from "@/components/ateliers/MonthCard";
 import { format, parseISO } from "date-fns";
 import fr from "date-fns/locale/fr";
 
-// ISR : régénère la page toutes les 60 secondes pour afficher les nouveaux ateliers
-export const revalidate = 60;
+// ISR : régénère la page toutes les 30 secondes (suppressions/modifs Sanity visibles rapidement)
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: "Ateliers - Fil & Flow",
