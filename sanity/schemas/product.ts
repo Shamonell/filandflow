@@ -47,6 +47,7 @@ export default defineType({
       options: {
         list: [
           { title: "Disponible", value: "disponible" },
+          { title: "En demande", value: "en demande" },
           { title: "Réservé", value: "réservé" },
           { title: "Vendu", value: "vendu" },
         ],

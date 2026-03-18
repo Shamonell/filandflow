@@ -1,0 +1,50 @@
+# Stripe — Configuration
+
+## Variables d'environnement (Vercel + .env.local)
+
+| Variable | Valeur | Obligatoire |
+|----------|--------|-------------|
+| `STRIPE_SECRET_KEY` | `sk_test_...` ou `sk_live_...` | Oui |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | `pk_test_...` ou `pk_live_...` | Oui |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_...` (voir ci-dessous) | Oui pour webhook |
+| `ORDER_EMAIL` | Ton email pour recevoir les notifications de vente | Oui pour emails |
+| `RESEND_API_KEY` | `re_...` (pour envoyer les emails) | Oui pour emails |
+| `SANITY_API_WRITE_TOKEN` | Token Sanity avec droits d'écriture | Oui pour webhook |
+
+---
+
+## Configurer le webhook Stripe
+
+1. Va sur **https://dashboard.stripe.com/webhooks**
+2. Clique **Add endpoint**
+3. **URL** : `https://filandflow.fr/api/webhooks/stripe` (ou ton domaine)
+4. **Événements** : sélectionne `checkout.session.completed`
+5. Clique **Add endpoint**
+6. Récupère le **Signing secret** (commence par `whsec_`)
+7. Ajoute dans Vercel : `STRIPE_WEBHOOK_SECRET=whsec_...`
+
+---
+
+## Ce qui est en place
+
+| Élément | Statut |
+|---------|--------|
+| Paiement Stripe + adresse livraison | OK |
+| Webhook : produit → « vendu » dans Sanity | OK |
+| Email à toi (client, adresse, montant, produit) | OK (si ORDER_EMAIL + RESEND_API_KEY) |
+| Statut « En demande » (WhatsApp) | OK — à mettre manuellement dans Sanity |
+
+---
+
+## Statuts produit (Sanity)
+
+- **Disponible** : en vente, bouton Acheter visible
+- **En demande** : quelqu'un a contacté (WhatsApp), pas encore vendu — à mettre manuellement
+- **Réservé** : réservé, en attente
+- **Vendu** : mis automatiquement par le webhook après paiement Stripe
+
+---
+
+## Email de confirmation au client
+
+Pour envoyer un email de confirmation au client après achat, il faudrait l'ajouter dans le webhook (envoi via Resend au `customer_details.email`). Dis-moi si tu veux que je le fasse.

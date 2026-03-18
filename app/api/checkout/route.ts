@@ -59,10 +59,14 @@ export async function POST(request: NextRequest) {
         ],
         success_url: successUrl,
         cancel_url: cancelUrl,
+        shipping_address_collection: {
+          allowed_countries: ["FR"],
+        },
         metadata: {
           type: "product",
           productSlug: product.slug.current,
           productId: product._id,
+          productTitle: product.title,
         },
       });
 

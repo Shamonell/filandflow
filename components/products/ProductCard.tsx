@@ -16,6 +16,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const statusColors = {
     disponible: "bg-green-100 text-green-800",
+    "en demande": "bg-amber-100 text-amber-800",
     réservé: "bg-yellow-100 text-yellow-800",
     vendu: "bg-gray-100 text-gray-800",
   };

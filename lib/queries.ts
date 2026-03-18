@@ -129,7 +129,7 @@ export interface Product {
   price: number;
   images: any[];
   description: any;
-  status: "disponible" | "réservé" | "vendu";
+  status: "disponible" | "en demande" | "réservé" | "vendu";
 }
 
 export interface WorkshopTemplate {

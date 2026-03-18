@@ -62,6 +62,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const statusColors = {
     disponible: "bg-green-100 text-green-800",
+    "en demande": "bg-amber-100 text-amber-800",
     réservé: "bg-yellow-100 text-yellow-800",
     vendu: "bg-gray-100 text-gray-800",
   };
@@ -181,10 +182,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           )}
 
-          {product.status === "réservé" && (
-            <div className="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
-              Ce produit est actuellement réservé. Contactez-nous pour être
-              informé(e) en cas de disponibilité.
+          {(product.status === "en demande" || product.status === "réservé") && (
+            <div className={cn(
+              "rounded-lg p-4 text-sm",
+              product.status === "en demande" ? "bg-amber-50 text-amber-800" : "bg-yellow-50 text-yellow-800"
+            )}>
+              {product.status === "en demande"
+                ? "Ce produit est en demande. Contactez-nous pour être informé(e) en cas de disponibilité."
+                : "Ce produit est actuellement réservé. Contactez-nous pour être informé(e) en cas de disponibilité."}
             </div>
           )}
 
