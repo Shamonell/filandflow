@@ -74,14 +74,14 @@ export default async function EventPage({ params }: EventPageProps) {
   const hasPlaces = hasAvailablePlaces(event);
 
   const statusColors = {
-    ouvert: "bg-green-100 text-green-800 border-green-200",
-    complet: "bg-red-100 text-red-800 border-red-200",
+    ouvert: "bg-[#6F8F72]/15 text-[#5C3A21] border-[#6F8F72]/30",
+    complet: "bg-red-50 text-red-800 border-red-200",
     passé: "bg-gray-100 text-gray-600 border-gray-200",
   };
   const placesColors = {
-    available: "bg-[#EEF4EE] text-[#6F8F72] border-[#6F8F72]/20",
-    few: "bg-orange-50 text-orange-700 border-orange-200",
-    full: "bg-red-50 text-red-700 border-red-300 font-semibold",
+    available: "bg-white/90 text-[#6F8F72] border-[#6F8F72]/30",
+    few: "bg-amber-50/90 text-amber-800 border-amber-200",
+    full: "bg-red-50/90 text-red-700 border-red-300 font-semibold",
   };
 
   const whatsappNumber =
@@ -100,33 +100,70 @@ export default async function EventPage({ params }: EventPageProps) {
   }>;
 
   return (
-    <div className="bg-[#FBF8F3]">
-      {/* Hero image */}
-      {heroImage && (
-        <section className="relative h-[280px] w-full md:h-[360px] lg:h-[420px]">
-          <Image
-            src={urlFor(heroImage)
-              .width(1200)
-              .height(630)
-              .format("webp")
-              .url()}
-            alt={display.title}
-            fill
-            className="object-cover object-center"
-            sizes="100vw"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-            <div className="container mx-auto max-w-4xl">
-              <h1 className="font-serif text-3xl font-light tracking-wide text-white drop-shadow-md md:text-4xl lg:text-5xl">
+    <div className="min-h-screen bg-[#FBF8F3]">
+      {/* Hero — grande image ou fond élégant */}
+      <section className="relative">
+        {heroImage ? (
+          <div className="relative h-[45vh] min-h-[300px] w-full md:h-[50vh] lg:h-[55vh]">
+            <Image
+              src={urlFor(heroImage)
+                .width(1600)
+                .height(900)
+                .format("webp")
+                .url()}
+              alt={display.title}
+              fill
+              className="object-cover object-center"
+              sizes="100vw"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#5C3A21]/80 via-[#5C3A21]/20 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 lg:p-12">
+              <div className="container mx-auto max-w-5xl">
+                <h1 className="font-serif text-3xl font-light tracking-wide text-white drop-shadow-lg md:text-4xl lg:text-5xl xl:text-6xl">
+                  {display.title}
+                </h1>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {placesInfo.text && (
+                    <span
+                      className={cn(
+                        "rounded-full border px-3 py-1.5 text-xs font-medium backdrop-blur-sm",
+                        placesColors[placesInfo.variant]
+                      )}
+                    >
+                      {placesInfo.text}
+                    </span>
+                  )}
+                  <span
+                    className={cn(
+                      "rounded-full border px-3 py-1.5 text-xs font-medium backdrop-blur-sm",
+                      event.status === "complet"
+                        ? "border-red-300/50 bg-red-900/80 text-white"
+                        : "border-white/40 bg-black/30 text-white"
+                    )}
+                  >
+                    {event.status === "complet"
+                      ? "Complet"
+                      : event.status === "ouvert"
+                        ? "Ouvert"
+                        : "Passé"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="relative flex min-h-[280px] items-center justify-center bg-gradient-to-br from-[#EEF4EE] via-[#FBF8F3] to-[#EEF4EE] md:min-h-[400px]">
+            <div className="absolute inset-0 border-b border-[#6F8F72]/10" />
+            <div className="relative z-10 px-6 text-center">
+              <h1 className="font-serif text-3xl font-light text-[#5C3A21] md:text-4xl lg:text-5xl">
                 {display.title}
               </h1>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {placesInfo.text && (
                   <span
                     className={cn(
-                      "rounded-full border px-3 py-1 text-xs font-semibold",
+                      "rounded-full border px-3 py-1.5 text-xs font-medium",
                       placesColors[placesInfo.variant]
                     )}
                   >
@@ -135,10 +172,8 @@ export default async function EventPage({ params }: EventPageProps) {
                 )}
                 <span
                   className={cn(
-                    "rounded-full border px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm",
-                    event.status === "complet"
-                      ? "border-red-300 bg-red-900/70"
-                      : "border-white/30 bg-black/30"
+                    "rounded-full border px-3 py-1.5 text-xs font-medium",
+                    statusColors[event.status]
                   )}
                 >
                   {event.status === "complet"
@@ -150,158 +185,124 @@ export default async function EventPage({ params }: EventPageProps) {
               </div>
             </div>
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
-      {!heroImage && (
-        <section className="border-b border-beige-200 bg-[#EEF4EE] py-8 md:py-10">
-          <div className="container mx-auto max-w-4xl px-4">
-            <h1 className="font-serif text-3xl font-light text-[#5C3A21] md:text-4xl">
-              {display.title}
-            </h1>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {placesInfo.text && (
-                <span
-                  className={cn(
-                    "rounded-full border-2 px-3 py-1 text-xs font-semibold",
-                    placesColors[placesInfo.variant]
-                  )}
-                >
-                  {placesInfo.text}
-                </span>
-              )}
-              <span
-                className={cn(
-                  "rounded-full border-2 px-3 py-1 text-sm font-semibold",
-                  statusColors[event.status]
-                )}
-              >
-                {event.status === "complet"
-                  ? "Complet"
-                  : event.status === "ouvert"
-                    ? "Ouvert"
-                    : "Passé"}
-              </span>
-            </div>
-          </div>
-        </section>
-      )}
-
-      <div className="container mx-auto max-w-4xl px-4 py-10 md:py-14">
-        {/* Bloc infos (date, durée, lieu, prix, places) */}
-        <div className="mb-10 rounded-2xl border border-beige-200 bg-white p-6 shadow-sm md:p-8">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">
-                Date
-              </p>
-              <p className="mt-1 font-medium text-[#5C3A21]">{formattedDate}</p>
-              <p className="text-[#5F6C72]">à {formattedTime}</p>
+      <div className="container mx-auto max-w-5xl px-4 py-12 md:py-16">
+        {/* Bloc infos — date, durée, lieu, prix, places — style carte */}
+        <div className="mb-12 -mt-8 rounded-2xl border border-[#6F8F72]/15 bg-white p-6 shadow-lg md:-mt-12 md:p-8">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="flex items-start gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEF4EE] text-[#6F8F72]">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">Date</p>
+                <p className="mt-0.5 font-medium text-[#5C3A21]">{formattedDate}</p>
+                <p className="text-sm text-[#5F6C72]">à {formattedTime}</p>
+              </div>
             </div>
             {display.duration && (
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">
-                  Durée
-                </p>
-                <p className="mt-1 font-medium text-[#5C3A21]">
-                  {display.duration}
-                </p>
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEF4EE] text-[#6F8F72]">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">Durée</p>
+                  <p className="mt-0.5 font-medium text-[#5C3A21]">{display.duration}</p>
+                </div>
               </div>
             )}
             {display.location && (
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">
-                  Lieu
-                </p>
-                <p className="mt-1 font-medium text-[#5C3A21]">
-                  {display.location}
-                </p>
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEF4EE] text-[#6F8F72]">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">Lieu</p>
+                  <p className="mt-0.5 font-medium text-[#5C3A21]">{display.location}</p>
+                </div>
               </div>
             )}
             {event.price != null && event.price > 0 && (
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">
-                  Prix
-                </p>
-                <p className="mt-1 font-medium text-[#5C3A21]">
-                  {event.price.toFixed(2)} €
-                </p>
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEF4EE] text-[#6F8F72]">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">Prix</p>
+                  <p className="mt-0.5 font-medium text-[#5C3A21]">{event.price.toFixed(2)} €</p>
+                </div>
               </div>
             )}
             {event.capacity != null && (
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">
-                  Places
-                </p>
-                <p className="mt-1 font-medium text-[#5C3A21]">
-                  {event.capacity} participant{event.capacity > 1 ? "s" : ""}
-                  {remainingPlaces !== null && remainingPlaces >= 0 && (
-                    <span
-                      className={cn(
-                        "ml-2",
-                        remainingPlaces === 0 ? "text-red-600" : "text-[#6F8F72]"
-                      )}
-                    >
-                      —{" "}
-                      {remainingPlaces === 0
-                        ? "Complet"
-                        : `${remainingPlaces} disponible${remainingPlaces > 1 ? "s" : ""}`}
-                    </span>
-                  )}
-                </p>
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEF4EE] text-[#6F8F72]">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-[#5F6C72]">Places</p>
+                  <p className="mt-0.5 font-medium text-[#5C3A21]">
+                    {event.capacity} participant{event.capacity > 1 ? "s" : ""}
+                    {remainingPlaces !== null && remainingPlaces >= 0 && (
+                      <span className={cn("ml-2", remainingPlaces === 0 ? "text-red-600" : "text-[#6F8F72]")}>
+                        — {remainingPlaces === 0 ? "Complet" : `${remainingPlaces} disponible${remainingPlaces > 1 ? "s" : ""}`}
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Description pour cette session */}
+        {/* Description pour cette session (mise en avant) */}
         {display.sessionDescription && (
-          <div className="mb-10 rounded-xl border-l-4 border-[#6F8F72] bg-[#EEF4EE]/50 px-5 py-4">
-            <p className="text-sm font-medium text-[#5C3A21]">
-              Pour cette session
-            </p>
-            <p className="mt-1 whitespace-pre-line text-[#1F2933]">
+          <div className="mb-12 rounded-2xl border-l-4 border-[#6F8F72] bg-[#EEF4EE]/60 px-6 py-5">
+            <p className="text-sm font-semibold text-[#5C3A21]">Pour cette session</p>
+            <p className="mt-2 whitespace-pre-line leading-relaxed text-[#1F2933]">
               {display.sessionDescription}
             </p>
           </div>
         )}
 
-        {/* Description principale (du type d'atelier) */}
-        {display.description && (
-          <section className="mb-12">
-            <h2 className="mb-4 font-serif text-2xl font-light text-[#5C3A21]">
-              À propos de cet atelier
-            </h2>
-            <div className="prose max-w-none text-[#5F6C72]">
-              <p className="whitespace-pre-line leading-relaxed">
-                {display.description}
-              </p>
-            </div>
-          </section>
-        )}
-
-        {/* Galerie d'images (2 à 4 images supplémentaires) */}
+        {/* Galerie — layout asymétrique */}
         {galleryImages.length > 0 && (
-          <section className="mb-12">
+          <section className="mb-14">
             <h2 className="mb-6 font-serif text-2xl font-light text-[#5C3A21]">
               Quelques réalisations
             </h2>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {galleryImages.map((img, i) => (
-                <div
-                  key={i}
-                  className="relative aspect-square overflow-hidden rounded-xl bg-beige-100"
-                >
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+              {galleryImages[0] && (
+                <div className="col-span-2 row-span-2 relative aspect-[4/3] overflow-hidden rounded-xl md:aspect-square">
                   <Image
-                    src={urlFor(img)
-                      .width(400)
-                      .height(400)
-                      .format("webp")
-                      .url()}
+                    src={urlFor(galleryImages[0]).width(800).height(600).format("webp").url()}
+                    alt={`${display.title} - 1`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 66vw"
+                  />
+                </div>
+              )}
+              {galleryImages.slice(1, 5).map((img, i) => (
+                <div key={i} className="relative aspect-square overflow-hidden rounded-xl">
+                  <Image
+                    src={urlFor(img).width(400).height(400).format("webp").url()}
                     alt={`${display.title} - ${i + 2}`}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 50vw, 25vw"
+                    sizes="(max-width: 768px) 50vw, 33vw"
                   />
                 </div>
               ))}
@@ -309,42 +310,34 @@ export default async function EventPage({ params }: EventPageProps) {
           </section>
         )}
 
-        {/* Ce que vous devez savoir */}
-        <section className="mb-12 rounded-2xl bg-white p-6 shadow-sm md:p-8">
+        {/* Description principale */}
+        {display.description && (
+          <section className="mb-14">
+            <h2 className="mb-6 font-serif text-2xl font-light text-[#5C3A21]">
+              À propos de cet atelier
+            </h2>
+            <p className="max-w-3xl whitespace-pre-line leading-relaxed text-[#5F6C72]">
+              {display.description}
+            </p>
+          </section>
+        )}
+
+        {/* Ce que vous devez savoir — style carte */}
+        <section className="mb-14 rounded-2xl border border-[#6F8F72]/10 bg-white p-6 shadow-sm md:p-8">
           <h2 className="mb-6 font-serif text-xl font-medium text-[#5C3A21]">
             Ce que vous devez savoir
           </h2>
-          <ul className="grid gap-4 sm:grid-cols-2">
+          <ul className="grid gap-5 sm:grid-cols-2">
             {[
-              {
-                label: "Tout le matériel est fourni",
-                sub: "Vous n'avez besoin de rien apporter",
-              },
-              {
-                label: "Aucun niveau requis",
-                sub: "Débutants et initiés sont les bienvenus",
-              },
-              {
-                label: "Petits groupes",
-                sub: "Pour un accompagnement personnalisé",
-              },
-              {
-                label: "Sans pression",
-                sub: "Créez à votre rythme, dans la bienveillance",
-              },
+              { label: "Tout le matériel est fourni", sub: "Vous n'avez besoin de rien apporter" },
+              { label: "Aucun niveau requis", sub: "Débutants et initiés sont les bienvenus" },
+              { label: "Petits groupes", sub: "Pour un accompagnement personnalisé" },
+              { label: "Sans pression", sub: "Créez à votre rythme, dans la bienveillance" },
             ].map((item, i) => (
               <li key={i} className="flex gap-3">
-                <span className="mt-1 shrink-0 text-[#6F8F72]" aria-hidden>
-                  <svg
-                    className="h-5 w-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
+                <span className="mt-1 shrink-0 text-[#6F8F72]">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </span>
                 <div>
@@ -356,110 +349,58 @@ export default async function EventPage({ params }: EventPageProps) {
           </ul>
         </section>
 
-        {/* CTA Inscription */}
+        {/* CTA Inscription — mise en avant */}
         {event.status === "ouvert" && hasPlaces && (
-          <section className="rounded-2xl border-2 border-[#6F8F72]/20 bg-[#EEF4EE] p-8 text-center md:p-10">
-            <h3 className="mb-2 font-serif text-2xl font-light text-[#5C3A21]">
+          <section className="rounded-2xl border-2 border-[#6F8F72]/20 bg-[#EEF4EE] p-8 text-center md:p-12">
+            <h3 className="mb-2 font-serif text-2xl font-light text-[#5C3A21] md:text-3xl">
               Réserver votre place
             </h3>
-            <p className="mb-6 text-[#5F6C72]">
-              Réservation sans paiement en ligne. Le paiement se fait sur place
-              le jour de l&apos;atelier.
+            <p className="mb-8 text-[#5F6C72]">
+              Réservation sans paiement en ligne. Le paiement se fait sur place le jour de l&apos;atelier.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex justify-center"
-              >
-                <Button size="lg" className="flex items-center gap-2">
-                  <Image
-                    src="/icone whatapp.PNG"
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="h-5 w-5 object-contain"
-                    aria-hidden
-                  />
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex justify-center">
+                <Button size="lg" className="flex items-center gap-2 bg-[#6F8F72] text-white hover:bg-[#5A726D]">
+                  <Image src="/icone whatapp.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
                   Je m&apos;inscris par WhatsApp
                 </Button>
               </a>
               <Link href={contactUrl}>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="flex items-center gap-2"
-                >
-                  <Image
-                    src="/icone lettre coeur.PNG"
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="h-5 w-5 object-contain"
-                    aria-hidden
-                  />
+                <Button variant="outline" size="lg" className="flex items-center gap-2 border-[#6F8F72] text-[#5C3A21] hover:bg-[#6F8F72]/10">
+                  <Image src="/icone lettre coeur.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
                   Je m&apos;inscris par email
                 </Button>
               </Link>
             </div>
-            <p className="mt-4 text-sm text-[#5F6C72]">
+            <p className="mt-6 text-sm text-[#5F6C72]">
               Message avec les détails de l&apos;atelier pré-remplis.
             </p>
           </section>
         )}
 
         {/* Atelier complet */}
-        {((event.status === "ouvert" && !hasPlaces) ||
-          event.status === "complet") && (
-          <section className="rounded-2xl border-2 border-red-200 bg-red-50 p-8 text-center md:p-10">
-            <p className="mb-2 text-xl font-semibold text-red-800">
-              Atelier complet
-            </p>
-            <p className="mb-6 text-red-700">
-              Les places sont mises à jour régulièrement. Je peux vous ajouter en
-              liste d&apos;attente.
+        {((event.status === "ouvert" && !hasPlaces) || event.status === "complet") && (
+          <section className="rounded-2xl border-2 border-red-200 bg-red-50/80 p-8 text-center md:p-10">
+            <p className="mb-2 font-serif text-xl font-medium text-red-800">Atelier complet</p>
+            <p className="mb-8 text-red-700">
+              Les places sont mises à jour régulièrement. Je peux vous ajouter en liste d&apos;attente.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <a
-                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bonjour Elisabeth,\n\nJe souhaite être ajouté(e) à la liste d'attente pour l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nMerci !`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-red-300 text-red-700 hover:bg-red-100"
-                >
-                  <Image
-                    src="/icone whatapp.PNG"
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="mr-2 inline h-5 w-5 object-contain"
-                    aria-hidden
-                  />
+              <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bonjour Elisabeth,\n\nJe souhaite être ajouté(e) à la liste d'attente pour l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nMerci !`)}`} target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" size="lg" className="border-red-300 text-red-700 hover:bg-red-100">
+                  <Image src="/icone whatapp.PNG" alt="" width={20} height={20} className="mr-2 inline h-5 w-5 object-contain" aria-hidden />
                   Me contacter par WhatsApp
                 </Button>
               </a>
-              <Link
-                href={`/contact?message=${encodeURIComponent(`Bonjour Elisabeth,\n\nJe souhaite être ajouté(e) à la liste d'attente pour l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nMerci !`)}`}
-              >
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-red-300 text-red-700 hover:bg-red-100"
-                >
+              <Link href={`/contact?message=${encodeURIComponent(`Bonjour Elisabeth,\n\nJe souhaite être ajouté(e) à la liste d'attente pour l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nMerci !`)}`}>
+                <Button variant="outline" size="lg" className="border-red-300 text-red-700 hover:bg-red-100">
                   Me contacter par email
                 </Button>
               </Link>
             </div>
-            <div className="mt-6 border-t border-red-200 pt-6">
+            <div className="mt-8 border-t border-red-200 pt-8">
               <Link href="/ateliers">
-                <Button
-                  size="lg"
-                  className="bg-[#6F8F72] text-white hover:bg-[#5A726D]"
-                >
+                <Button size="lg" className="bg-[#6F8F72] text-white hover:bg-[#5A726D]">
                   Voir les autres ateliers
                 </Button>
               </Link>

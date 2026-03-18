@@ -37,14 +37,14 @@ export default async function Home() {
                   className="h-auto w-full select-none"
                   priority
                 />
-                <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12 lg:p-16">
-                  <div className="w-full">
-                    <h1 className="mb-4 text-[1.65rem] font-light leading-tight text-[#5C3A21] sm:mb-6 sm:text-5xl md:mb-8 md:text-6xl lg:text-7xl">
+                <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 md:p-10 lg:p-14">
+                  <div className="w-full max-w-full overflow-hidden px-1">
+                    <h1 className="mb-2 text-base font-light leading-tight text-[#5C3A21] sm:mb-4 sm:text-3xl md:mb-6 md:text-4xl lg:mb-8 lg:text-5xl xl:text-6xl">
               Tu rêves d&apos;un moment créatif pour toi,
               <br />
               <span className="text-[#6F8F72]">mais tu ne sais pas par où commencer</span>
             </h1>
-                    <p className="mx-auto mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-[#5F6C72] sm:mt-6 sm:text-xl md:mt-8 md:text-2xl">
+                    <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-[#5F6C72] sm:mt-4 sm:text-base md:mt-6 md:text-lg lg:mt-8 lg:text-xl xl:text-2xl">
               Prendre le temps de créer de tes mains, retrouver le plaisir simple
               de la création, sans pression ni performance. C&apos;est exactement
               ce que je te propose.
