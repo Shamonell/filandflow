@@ -40,9 +40,13 @@ export default async function Home() {
                 <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 md:p-10 lg:p-14">
                   <div className="w-full max-w-full overflow-hidden px-1">
                     <h1 className="mb-2 text-base font-light leading-tight text-[#5C3A21] sm:mb-4 sm:text-3xl md:mb-6 md:text-4xl lg:mb-8 lg:text-5xl xl:text-6xl">
-              Tu rêves d&apos;un moment créatif pour toi,
+              Tu rêves d&apos;un moment
               <br />
-              <span className="text-[#6F8F72]">mais tu ne sais pas par où commencer</span>
+              créatif pour toi,
+              <br />
+              <span className="text-[#6F8F72]">mais tu ne sais pas par</span>
+              <br />
+              <span className="text-[#6F8F72]">où commencer</span>
             </h1>
                     <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-[#5F6C72] sm:mt-4 sm:text-base md:mt-6 md:text-lg lg:mt-8 lg:text-xl xl:text-2xl">
               Prendre le temps de créer de tes mains, retrouver le plaisir simple
