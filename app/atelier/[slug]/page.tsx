@@ -1,13 +1,15 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
-import { format } from "date-fns";
-import fr from "date-fns/locale/fr";
 import { getEventBySlug, getEvents } from "@/lib/queries";
 import { urlFor } from "@/lib/sanity";
 import Button from "@/components/ui/Button";
+import WorkshopSalesTermsButtons from "@/components/atelier/WorkshopSalesTermsButtons";
 import { cn } from "@/lib/utils";
+import {
+  formatEventInParis,
+  isEventOnOrAfterTodayParis,
+} from "@/lib/eventParis";
 import {
   getRemainingPlaces,
   getPlacesMessage,
@@ -24,14 +26,8 @@ export const revalidate = 30;
 export async function generateStaticParams() {
   try {
     const events = await getEvents();
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
     return events
-      .filter((event) => {
-        const eventDate = new Date(event.dateStart);
-        eventDate.setHours(0, 0, 0, 0);
-        return eventDate >= now;
-      })
+      .filter((event) => isEventOnOrAfterTodayParis(event.dateStart))
       .map((event) => ({ slug: event.slug.current }));
   } catch {
     return [];
@@ -59,16 +55,14 @@ export default async function EventPage({ params }: EventPageProps) {
   }
   if (!event) notFound();
 
-  const eventDate = new Date(event.dateStart);
-  eventDate.setHours(0, 0, 0, 0);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if (eventDate < today) notFound();
+  if (!isEventOnOrAfterTodayParis(event.dateStart)) notFound();
 
   const display = getEventDisplayInfo(event);
-  const date = new Date(event.dateStart);
-  const formattedDate = format(date, "EEEE d MMMM yyyy", { locale: fr });
-  const formattedTime = format(date, "HH:mm", { locale: fr });
+  const formattedDate = formatEventInParis(
+    event.dateStart,
+    "EEEE d MMMM yyyy"
+  );
+  const formattedTime = formatEventInParis(event.dateStart, "HH:mm");
   const remainingPlaces = getRemainingPlaces(event);
   const placesInfo = getPlacesMessage(event);
   const hasPlaces = hasAvailablePlaces(event);
@@ -87,8 +81,11 @@ export default async function EventPage({ params }: EventPageProps) {
   const whatsappNumber =
     process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "33600000000";
   const inscriptionMessage = `Bonjour Elisabeth,\n\nJe souhaite m'inscrire à l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nPourriez-vous me confirmer s'il reste des places disponibles ?\n\nMerci !`;
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(inscriptionMessage)}`;
-  const contactUrl = `/contact?message=${encodeURIComponent(inscriptionMessage)}`;
+  const signupWhatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(inscriptionMessage)}`;
+  const signupContactUrl = `/contact?message=${encodeURIComponent(inscriptionMessage)}`;
+  const waitlistMessage = `Bonjour Elisabeth,\n\nJe souhaite être ajouté(e) à la liste d'attente pour l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nMerci !`;
+  const waitlistWhatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waitlistMessage)}`;
+  const waitlistContactUrl = `/contact?message=${encodeURIComponent(waitlistMessage)}`;
 
   const heroImage = display.images?.[0];
   const galleryImages = (display.images?.length
@@ -349,64 +346,16 @@ export default async function EventPage({ params }: EventPageProps) {
           </ul>
         </section>
 
-        {/* CTA Inscription — mise en avant */}
-        {event.status === "ouvert" && hasPlaces && (
-          <section className="rounded-2xl border-2 border-[#6F8F72]/20 bg-[#EEF4EE] p-8 text-center md:p-12">
-            <h3 className="mb-2 font-serif text-2xl font-light text-[#5C3A21] md:text-3xl">
-              Réserver votre place
-            </h3>
-            <p className="mb-8 text-[#5F6C72]">
-              Réservation sans paiement en ligne. Le paiement se fait sur place le jour de l&apos;atelier.
-            </p>
-            <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex justify-center">
-                <Button size="lg" className="flex items-center gap-2 bg-[#6F8F72] text-white hover:bg-[#5A726D]">
-                  <Image src="/icone whatapp.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
-                  Je m&apos;inscris par WhatsApp
-                </Button>
-              </a>
-              <Link href={contactUrl}>
-                <Button variant="outline" size="lg" className="flex items-center gap-2 border-[#6F8F72] text-[#5C3A21] hover:bg-[#6F8F72]/10">
-                  <Image src="/icone lettre coeur.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
-                  Je m&apos;inscris par email
-                </Button>
-              </Link>
-            </div>
-            <p className="mt-6 text-sm text-[#5F6C72]">
-              Message avec les détails de l&apos;atelier pré-remplis.
-            </p>
-          </section>
-        )}
-
-        {/* Atelier complet */}
-        {((event.status === "ouvert" && !hasPlaces) || event.status === "complet") && (
-          <section className="rounded-2xl border-2 border-red-200 bg-red-50/80 p-8 text-center md:p-10">
-            <p className="mb-2 font-serif text-xl font-medium text-red-800">Atelier complet</p>
-            <p className="mb-8 text-red-700">
-              Les places sont mises à jour régulièrement. Je peux vous ajouter en liste d&apos;attente.
-            </p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bonjour Elisabeth,\n\nJe souhaite être ajouté(e) à la liste d'attente pour l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nMerci !`)}`} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="lg" className="border-red-300 text-red-700 hover:bg-red-100">
-                  <Image src="/icone whatapp.PNG" alt="" width={20} height={20} className="mr-2 inline h-5 w-5 object-contain" aria-hidden />
-                  Me contacter par WhatsApp
-                </Button>
-              </a>
-              <Link href={`/contact?message=${encodeURIComponent(`Bonjour Elisabeth,\n\nJe souhaite être ajouté(e) à la liste d'attente pour l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nMerci !`)}`}>
-                <Button variant="outline" size="lg" className="border-red-300 text-red-700 hover:bg-red-100">
-                  Me contacter par email
-                </Button>
-              </Link>
-            </div>
-            <div className="mt-8 border-t border-red-200 pt-8">
-              <Link href="/ateliers">
-                <Button size="lg" className="bg-[#6F8F72] text-white hover:bg-[#5A726D]">
-                  Voir les autres ateliers
-                </Button>
-              </Link>
-            </div>
-          </section>
-        )}
+        <WorkshopSalesTermsButtons
+          signupWhatsappUrl={signupWhatsappUrl}
+          signupContactUrl={signupContactUrl}
+          waitlistWhatsappUrl={waitlistWhatsappUrl}
+          waitlistContactUrl={waitlistContactUrl}
+          showSignup={event.status === "ouvert" && hasPlaces}
+          showWaitlist={
+            (event.status === "ouvert" && !hasPlaces) || event.status === "complet"
+          }
+        />
       </div>
     </div>
   );

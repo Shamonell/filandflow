@@ -1,8 +1,10 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import ContactButton from "@/components/ui/ContactButton";
-import { GIFT_CARDS } from "@/lib/gift-cards";
+import { getGiftCards } from "@/lib/queries";
 import GiftCardImage from "@/components/bons-cadeaux/GiftCardImage";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Bons cadeaux - Fil & Flow",
@@ -10,7 +12,9 @@ export const metadata: Metadata = {
     "Offrez un moment de bien-être et de création avec nos cartes cadeaux et packs",
 };
 
-export default function BonsCadeauxPage() {
+export default async function BonsCadeauxPage() {
+  const cards = await getGiftCards();
+
   return (
     <div className="bg-[#FBF8F3]">
       <div className="container mx-auto px-4 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20">
@@ -39,12 +43,12 @@ export default function BonsCadeauxPage() {
 
           {/* Cartes cliquables - clic direct vers paiement en ligne */}
           <div className="mb-12 space-y-12">
-            {GIFT_CARDS.map((card) => (
+            {cards.map((card) => (
               <GiftCardImage
                 key={card.id}
                 cardId={card.id}
-                image={card.image}
-                name={card.name}
+                image={card.imageUrl}
+                name={card.title}
                 price={card.price}
               />
             ))}

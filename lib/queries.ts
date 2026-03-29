@@ -1,5 +1,7 @@
 import { groq } from "next-sanity";
-import { client } from "./sanity";
+import { SanityImageSource } from "@sanity/image-url/lib/types/types";
+import { client, urlFor } from "./sanity";
+import { giftCardsFallbackAsOffers, type GiftCardOffer } from "./gift-cards";
 
 // Query pour récupérer tous les produits (uniquement les documents publiés, pas les drafts)
 export const productsQuery = groq`
@@ -121,6 +123,28 @@ export const eventBySlugQuery = groq`
   }
 `;
 
+export const giftCardsQuery = groq`
+  *[_type == "giftCard" && !(_id in path("drafts.**"))] | order(sortOrder asc, title asc) {
+    _id,
+    title,
+    slug,
+    price,
+    image,
+    legacyImagePath
+  }
+`;
+
+export const giftCardBySlugQuery = groq`
+  *[_type == "giftCard" && slug.current == $id && !(_id in path("drafts.**"))][0] {
+    _id,
+    title,
+    slug,
+    price,
+    image,
+    legacyImagePath
+  }
+`;
+
 // Types
 export interface Product {
   _id: string;
@@ -187,4 +211,63 @@ export async function getEventsByTemplateSlug(
   return await client.fetch(eventsByTemplateSlugQuery, { templateSlug });
 }
 
+function mapSanityGiftRow(row: {
+  slug: { current: string };
+  title: string;
+  price: number;
+  image?: SanityImageSource | null;
+  legacyImagePath?: string | null;
+}): GiftCardOffer {
+  let imageUrl = "";
+  if (row.image) {
+    imageUrl = urlFor(row.image).width(900).format("webp").url();
+  } else if (row.legacyImagePath?.trim()) {
+    imageUrl = row.legacyImagePath.trim();
+  }
+  return {
+    id: row.slug.current,
+    title: row.title,
+    price: row.price,
+    imageUrl,
+  };
+}
 
+/** Liste des bons cadeaux pour la page et le paiement. Repli sur les valeurs locales si Sanity est vide. */
+export async function getGiftCards(): Promise<GiftCardOffer[]> {
+  try {
+    const rows = await client.fetch<
+      Array<{
+        slug: { current: string };
+        title: string;
+        price: number;
+        image?: SanityImageSource | null;
+        legacyImagePath?: string | null;
+      }>
+    >(giftCardsQuery);
+    if (!rows?.length) return giftCardsFallbackAsOffers();
+    return rows.map(mapSanityGiftRow);
+  } catch {
+    return giftCardsFallbackAsOffers();
+  }
+}
+
+/** Une offre par slug (Stripe / checkout). Repli sur la config locale. */
+export async function getGiftCardByShopId(
+  id: string
+): Promise<GiftCardOffer | null> {
+  try {
+    const row = await client.fetch<{
+      slug: { current: string };
+      title: string;
+      price: number;
+      image?: SanityImageSource | null;
+      legacyImagePath?: string | null;
+    } | null>(giftCardBySlugQuery, { id });
+    if (row) return mapSanityGiftRow(row);
+  } catch {
+    /* repli ci-dessous */
+  }
+  return giftCardsFallbackAsOffers().find((c) => c.id === id) ?? null;
+}
+
+export type { GiftCardOffer };

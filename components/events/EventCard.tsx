@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { format } from "date-fns";
-import fr from "date-fns/locale/fr";
 import { Event } from "@/lib/queries";
+import { formatEventInParis } from "@/lib/eventParis";
 import { cn } from "@/lib/utils";
 import { getPlacesMessage } from "@/lib/eventUtils";
 
@@ -10,11 +9,10 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event }: EventCardProps) {
-  const date = new Date(event.dateStart);
-  const dayNumber = format(date, "d", { locale: fr });
-  const dayName = format(date, "EEEE", { locale: fr });
-  const monthYear = format(date, "MMMM yyyy", { locale: fr });
-  const time = format(date, "HH:mm", { locale: fr });
+  const dayNumber = formatEventInParis(event.dateStart, "d");
+  const dayName = formatEventInParis(event.dateStart, "EEEE");
+  const monthYear = formatEventInParis(event.dateStart, "MMMM yyyy");
+  const time = formatEventInParis(event.dateStart, "HH:mm");
 
   const statusColors = {
     ouvert: "bg-green-100 text-green-800 border-green-200",
@@ -41,7 +39,7 @@ export default function EventCard({ event }: EventCardProps) {
                 {dayNumber}
               </span>
               <span className="text-xs font-medium uppercase text-gray-600">
-                {format(date, "MMM", { locale: fr })}
+                {formatEventInParis(event.dateStart, "MMM")}
               </span>
             </div>
             <div className="flex-1">

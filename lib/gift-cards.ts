@@ -1,30 +1,36 @@
 /**
- * Configuration des bons cadeaux : id, nom, prix (€).
- * Modifiez les prix ici selon vos tarifs.
+ * Repli local si aucun document « Bon cadeau » n’est publié dans Sanity.
+ * Dès que tu crées et publies les bons cadeaux dans /admin, ces valeurs ne sont plus utilisées pour l’affichage.
  */
-export const GIFT_CARDS = [
+
+export type GiftCardOffer = {
+  id: string;
+  title: string;
+  price: number;
+  imageUrl: string;
+};
+
+const FALLBACK = [
   {
     id: "carte-cadeau",
-    name: "Carte cadeau 1 atelier",
+    title: "Carte cadeau 1 atelier",
     price: 50,
-    image: "/carte cadeau un atlier.png",
+    imageUrl: "/carte cadeau un atlier.png",
   },
   {
     id: "duo-creatif",
-    name: "Duo créatif (2 ateliers)",
+    title: "Duo créatif (2 ateliers)",
     price: 95,
-    image: "/duo creatif.png",
+    imageUrl: "/duo creatif.png",
   },
   {
     id: "pack-decouverte",
-    name: "Pack découverte (3 ateliers)",
+    title: "Pack découverte (3 ateliers)",
     price: 135,
-    image: "/packe decouverte.png",
+    imageUrl: "/packe decouverte.png",
   },
-] as const;
+] as const satisfies readonly GiftCardOffer[];
 
-export type GiftCardId = (typeof GIFT_CARDS)[number]["id"];
-
-export function getGiftCardById(id: string): (typeof GIFT_CARDS)[number] | undefined {
-  return GIFT_CARDS.find((g) => g.id === id);
+export function giftCardsFallbackAsOffers(): GiftCardOffer[] {
+  return [...FALLBACK];
 }

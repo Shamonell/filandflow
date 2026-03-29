@@ -2,8 +2,12 @@ import { Metadata } from "next";
 import { getEvents, Event } from "@/lib/queries";
 import ContactButton from "@/components/ui/ContactButton";
 import MonthCard from "@/components/ateliers/MonthCard";
-import { format, parseISO } from "date-fns";
-import fr from "date-fns/locale/fr";
+import { parseISO } from "date-fns";
+import {
+  formatEventInParis,
+  parisDayKey,
+  todayParisDayKey,
+} from "@/lib/eventParis";
 
 // ISR : régénère la page toutes les 30 secondes (suppressions/modifs Sanity visibles rapidement)
 export const revalidate = 30;
@@ -15,18 +19,14 @@ export const metadata: Metadata = {
 
 // Fonction pour grouper les ateliers par mois
 function groupEventsByMonth(events: Awaited<ReturnType<typeof getEvents>>) {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0); // Comparer seulement les dates, pas les heures
+  const todayKey = todayParisDayKey();
   const grouped: Record<string, typeof events> = {};
 
   events.forEach((event) => {
-    const eventDate = new Date(event.dateStart);
-    eventDate.setHours(0, 0, 0, 0);
-    
-    // Ignorer les ateliers dont la date est passée (peu importe le statut)
-    if (eventDate < now) return;
+    // Jour calendaire à Paris (hébergement Vercel = UTC sinon décalage)
+    if (parisDayKey(event.dateStart) < todayKey) return;
 
-    const monthKey = format(eventDate, "MMMM yyyy", { locale: fr });
+    const monthKey = formatEventInParis(event.dateStart, "MMMM yyyy");
     if (!grouped[monthKey]) {
       grouped[monthKey] = [];
     }

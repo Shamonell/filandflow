@@ -1,5 +1,15 @@
 # Stripe — Configuration
 
+## Montants affichés dans Stripe (Checkout)
+
+Les prix dans le code (`product.price`, `gift.price`) sont en **euros** (nombre entier ou décimal).  
+La création de session multiplie par **100** pour obtenir les **centimes** (`unit_amount: Math.round(price * 100)`), ce que Stripe attend.
+
+- Si tu vois un montant **énorme** sur la page Stripe : vérifie que le prix dans Sanity ou dans `lib/gift-cards.ts` n’est **pas** déjà en centimes (ex. `5000` pour 50 € au lieu de `50`).
+- En test, utilise les [cartes de test Stripe](https://docs.stripe.com/testing).
+
+---
+
 ## Variables d'environnement (Vercel + .env.local)
 
 | Variable | Valeur | Obligatoire |

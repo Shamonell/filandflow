@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { format } from "date-fns";
-import fr from "date-fns/locale/fr";
 import { urlFor } from "@/lib/sanity";
+import { isEventOnOrAfterTodayParis } from "@/lib/eventParis";
 import EventCard from "@/components/events/EventCard";
 import type { WorkshopTemplate } from "@/lib/queries";
 import type { Event } from "@/lib/queries";
@@ -16,13 +15,11 @@ export default function WorkshopTypePage({
   template,
   events,
 }: WorkshopTypePageProps) {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const upcomingEvents = events.filter((e) => {
-    const d = new Date(e.dateStart);
-    d.setHours(0, 0, 0, 0);
-    return d >= now && (e.status === "ouvert" || e.status === "complet");
-  });
+  const upcomingEvents = events.filter(
+    (e) =>
+      isEventOnOrAfterTodayParis(e.dateStart) &&
+      (e.status === "ouvert" || e.status === "complet")
+  );
 
   if (!template) {
     return (

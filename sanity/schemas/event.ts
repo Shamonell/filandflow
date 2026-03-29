@@ -44,6 +44,8 @@ export default defineType({
       name: "dateStart",
       title: "Date et heure de début",
       type: "datetime",
+      description:
+        "Saisissez l’heure réelle du créneau en France. Sur le site, l’affichage utilise le fuseau Europe/Paris (heure d’été / hiver gérée automatiquement).",
       validation: (Rule) => Rule.required(),
     }),
     defineField({

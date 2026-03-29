@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
-import { getProductBySlug } from "@/lib/queries";
-import { getGiftCardById } from "@/lib/gift-cards";
+import { getProductBySlug, getGiftCardByShopId } from "@/lib/queries";
 
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
@@ -80,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (type === "gift" && giftId) {
-      const gift = getGiftCardById(giftId);
+      const gift = await getGiftCardByShopId(giftId);
       if (!gift) {
         return NextResponse.json(
           { error: "Bon cadeau introuvable" },
@@ -97,7 +96,7 @@ export async function POST(request: NextRequest) {
             price_data: {
               currency: "eur",
               product_data: {
-                name: gift.name,
+                name: gift.title,
                 description: "Bon cadeau Fil & Flow - Valable 1 an",
               },
               unit_amount: Math.round(gift.price * 100),

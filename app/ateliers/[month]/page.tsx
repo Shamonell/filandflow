@@ -5,8 +5,12 @@ import Image from "next/image";
 import { getEvents, Event } from "@/lib/queries";
 import EventCard from "@/components/events/EventCard";
 import ContactButton from "@/components/ui/ContactButton";
-import { format, parseISO } from "date-fns";
-import fr from "date-fns/locale/fr";
+import { parseISO } from "date-fns";
+import {
+  formatEventInParis,
+  parisDayKey,
+  todayParisDayKey,
+} from "@/lib/eventParis";
 
 interface MonthPageProps {
   params: { month: string };
@@ -112,19 +116,13 @@ export default async function MonthPage({ params }: MonthPageProps) {
   }
 
   const monthKey = slugToMonthKey(params.month);
-  const now = new Date();
-  now.setHours(0, 0, 0, 0); // Réinitialiser l'heure pour comparer seulement les dates
+  const todayKey = todayParisDayKey();
 
   // Filtrer les ateliers du mois concerné (uniquement ceux à venir)
   const monthEvents = events.filter((event) => {
-    const eventDate = new Date(event.dateStart);
-    eventDate.setHours(0, 0, 0, 0);
-    
-    // Ignorer les ateliers dont la date est passée
-    if (eventDate < now) return false;
-    
-    // Obtenir le mois/année de l'événement
-    const eventMonthKey = format(eventDate, "MMMM yyyy", { locale: fr });
+    if (parisDayKey(event.dateStart) < todayKey) return false;
+
+    const eventMonthKey = formatEventInParis(event.dateStart, "MMMM yyyy");
     
     // Comparaison directe d'abord (sensible à la casse et aux accents)
     if (eventMonthKey === monthKey) {
