@@ -46,6 +46,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const email = sanitizeInput(body.email || "");
     const message = sanitizeInput(body.message || "");
+    const honeypot = typeof body.website === "string" ? body.website : "";
+    const loadedAt = typeof body.loadedAt === "number" ? body.loadedAt : 0;
+
+    // Honeypot : champ caché aux humains. Si rempli → bot. On renvoie 200 pour ne pas l'alerter.
+    if (honeypot.trim().length > 0) {
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
+
+    // Time-check : un humain met au moins 2 sec à remplir le formulaire.
+    // Soumission < 2 sec après chargement = bot. 200 silencieux.
+    if (loadedAt > 0 && Date.now() - loadedAt < 2000) {
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
 
     // Validation
     if (!email || !message) {
@@ -61,6 +74,12 @@ export async function POST(request: NextRequest) {
         { error: "Le message est trop long (max 5000 caractères)" },
         { status: 400 }
       );
+    }
+
+    // Anti-spam : rejet silencieux si trop de liens (SEO spam typique).
+    const linkCount = (message.match(/https?:\/\//gi) || []).length;
+    if (linkCount > 3) {
+      return NextResponse.json({ success: true }, { status: 200 });
     }
 
     // Vérifier le format de l'email

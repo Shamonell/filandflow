@@ -10,7 +10,9 @@ function ContactForm() {
   const [formData, setFormData] = useState({
     email: "",
     message: "",
+    website: "", // honeypot — laissé vide par les humains, rempli par les bots
   });
+  const [loadedAt] = useState(() => Date.now());
 
   // Pré-remplir le message si un paramètre est présent dans l'URL
   useEffect(() => {
@@ -41,6 +43,8 @@ function ContactForm() {
         body: JSON.stringify({
           email: formData.email,
           message: formData.message,
+          website: formData.website,
+          loadedAt,
         }),
       });
 
@@ -51,7 +55,7 @@ function ContactForm() {
       }
 
       setSubmitStatus("success");
-      setFormData({ email: "", message: "" }); // Réinitialiser le formulaire
+      setFormData({ email: "", message: "", website: "" }); // Réinitialiser le formulaire
     } catch (error) {
       console.error("Erreur:", error);
       setSubmitStatus("error");
@@ -148,6 +152,33 @@ function ContactForm() {
                         placeholder="Parlez-moi de votre projet, de vos envies créatives..."
             />
           </div>
+
+                    {/* Honeypot anti-bot : invisible aux humains, rempli par les bots */}
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        left: "-9999px",
+                        width: "1px",
+                        height: "1px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <label htmlFor="website">
+                        Votre site web (laissez vide)
+                      </label>
+                      <input
+                        type="text"
+                        id="website"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={formData.website}
+                        onChange={(e) =>
+                          setFormData({ ...formData, website: e.target.value })
+                        }
+                      />
+                    </div>
 
           {submitStatus === "success" && (
                       <div className="rounded-lg bg-[#EEF4EE] border-2 border-[#6F8F72] p-4 text-[#5C3A21]">
