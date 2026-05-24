@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Button from "@/components/ui/Button";
+import SalesTermsModal from "@/components/legal/SalesTermsModal";
 
 type CheckoutButtonProps = {
   type: "product" | "gift";
@@ -21,8 +22,9 @@ export default function CheckoutButton({
   size = "md",
 }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
-  const handleClick = async () => {
+  const startCheckout = async () => {
     if (loading) return;
     const payload =
       type === "product"
@@ -53,15 +55,38 @@ export default function CheckoutButton({
     }
   };
 
+  const handleOpenTerms = () => {
+    if (loading) return;
+    setShowTerms(true);
+  };
+
+  const termsHref = type === "gift" ? "/cgv#bons-cadeaux" : "/cgv#boutique";
+  const scopePhrase =
+    type === "gift"
+      ? "l'achat de ce bon cadeau et le paiement sécurisé"
+      : "l'achat de cette création et le paiement sécurisé";
+
   return (
-    <Button
-      type="button"
-      onClick={handleClick}
-      disabled={loading}
-      className={className}
-      size={size}
-    >
-      {loading ? "Redirection..." : children ?? "Payer en ligne"}
-    </Button>
+    <>
+      <Button
+        type="button"
+        onClick={handleOpenTerms}
+        disabled={loading}
+        className={className}
+        size={size}
+      >
+        {loading ? "Redirection..." : children ?? "Payer en ligne"}
+      </Button>
+      <SalesTermsModal
+        open={showTerms}
+        onClose={() => setShowTerms(false)}
+        onConfirm={() => {
+          setShowTerms(false);
+          void startCheckout();
+        }}
+        termsHref={termsHref}
+        scopePhrase={scopePhrase}
+      />
+    </>
   );
 }

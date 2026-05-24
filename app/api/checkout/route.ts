@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
         metadata: {
           type: "gift",
           giftId: gift.id,
+          giftTitle: gift.title,
         },
       });
 

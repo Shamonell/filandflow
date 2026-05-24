@@ -88,9 +88,85 @@ async function sendConfirmationEmailToCustomer(params: {
   }
 }
 
+async function sendGiftOrderEmailToSeller(params: {
+  giftTitle: string;
+  amount: number;
+  customerEmail: string;
+  customerName: string | null;
+}) {
+  const { giftTitle, amount, customerEmail, customerName } = params;
+  const resendKey = process.env.RESEND_API_KEY;
+  const recipientEmail = process.env.ORDER_EMAIL || process.env.CONTACT_EMAIL;
+
+  if (!resendKey || !recipientEmail) {
+    console.warn("ORDER_EMAIL/CONTACT_EMAIL ou RESEND_API_KEY manquant - email bon cadeau non envoyé");
+    return;
+  }
+
+  try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(resendKey);
+
+    await resend.emails.send({
+      from: "Fil & Flow <onboarding@resend.dev>",
+      to: recipientEmail,
+      subject: `Nouveau bon cadeau vendu - ${giftTitle}`,
+      html: `
+        <h2>Nouveau bon cadeau vendu</h2>
+        <p><strong>Offre :</strong> ${giftTitle}</p>
+        <p><strong>Montant :</strong> ${(amount / 100).toFixed(2)} €</p>
+        <p><strong>Client :</strong> ${customerName || customerEmail}</p>
+        <p><strong>Email :</strong> ${customerEmail}</p>
+        <p style="margin-top:16px;color:#555">À envoyer manuellement : la carte cadeau (PDF) au client.</p>
+      `,
+    });
+  } catch (err) {
+    console.error("Erreur envoi email bon cadeau (vendeur):", err);
+  }
+}
+
+async function sendGiftConfirmationEmailToCustomer(params: {
+  customerEmail: string;
+  giftTitle: string;
+  amount: number;
+}) {
+  const { customerEmail, giftTitle, amount } = params;
+  const resendKey = process.env.RESEND_API_KEY;
+
+  if (!resendKey || !customerEmail || customerEmail === "Non fourni") {
+    return;
+  }
+
+  try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(resendKey);
+
+    await resend.emails.send({
+      from: "Fil & Flow <onboarding@resend.dev>",
+      to: customerEmail,
+      subject: `Confirmation de votre bon cadeau - ${giftTitle}`,
+      html: `
+        <h2>Merci pour votre achat !</h2>
+        <p>Bonjour,</p>
+        <p>Nous avons bien reçu votre paiement pour <strong>${giftTitle}</strong>.</p>
+        <p><strong>Montant :</strong> ${(amount / 100).toFixed(2)} €</p>
+        <p>Votre bon cadeau vous sera envoyé par email dans les meilleurs délais.</p>
+        <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+        <p>À bientôt,<br>L'équipe Fil & Flow</p>
+      `,
+    });
+  } catch (err) {
+    console.error("Erreur envoi email confirmation bon cadeau (client):", err);
+  }
+}
+
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const metadata = session.metadata;
   if (!metadata) return;
+
+  const amount = session.amount_total ?? 0;
+  const customerEmail = session.customer_details?.email ?? session.customer_email ?? "Non fourni";
+  const customerName = session.customer_details?.name ?? null;
 
   if (metadata.type === "product" && metadata.productId) {
     try {
@@ -99,11 +175,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.error("Erreur mise à jour Sanity:", err);
     }
 
-    const amount = session.amount_total ?? 0;
-    const customerEmail = session.customer_details?.email ?? session.customer_email ?? "Non fourni";
-    const customerName = session.customer_details?.name ?? null;
     const address = formatAddress(session);
-
     const productName = metadata.productTitle || metadata.productSlug || "Produit";
 
     await sendOrderEmailToSeller({
@@ -117,6 +189,24 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     await sendConfirmationEmailToCustomer({
       customerEmail,
       productName,
+      amount,
+    });
+    return;
+  }
+
+  if (metadata.type === "gift" && metadata.giftId) {
+    const giftTitle = metadata.giftTitle || metadata.giftId;
+
+    await sendGiftOrderEmailToSeller({
+      giftTitle,
+      amount,
+      customerEmail,
+      customerName,
+    });
+
+    await sendGiftConfirmationEmailToCustomer({
+      customerEmail,
+      giftTitle,
       amount,
     });
   }

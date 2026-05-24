@@ -8,62 +8,82 @@ import { defineType, defineField } from "sanity";
  */
 export default defineType({
   name: "workshopTemplate",
-  title: "Type d'atelier",
+  title: "Type d'atelier (modèle)",
   type: "document",
+  groups: [
+    { name: "essentiels", title: "Essentiels", default: true },
+    { name: "images", title: "Photos" },
+    { name: "defaults", title: "Valeurs par défaut" },
+  ],
   fields: [
     defineField({
       name: "title",
-      title: "Titre",
+      title: "Nom du type",
       type: "string",
-      description: "Ex: Couture, Broderie, Macramé, Tissage",
-      validation: (Rule) => Rule.required(),
+      description: "Ex. Couture, Broderie, Macramé, Tissage.",
+      group: "essentiels",
+      validation: (Rule) =>
+        Rule.required().error("Le nom du type est obligatoire."),
     }),
     defineField({
       name: "slug",
-      title: "Slug (identifiant du type)",
+      title: "Identifiant URL (slug)",
       type: "slug",
       options: {
         source: "title",
         maxLength: 96,
       },
-      validation: (Rule) => Rule.required(),
-      description: "Ex: couture, broderie, macrame (utilisé pour les URLs si besoin)",
+      description:
+        "Ex. couture, broderie, macrame. ⚠️ Doit correspondre au chemin du code (ex. /atelier/couture). Ne modifiez pas un slug existant.",
+      group: "essentiels",
+      validation: (Rule) =>
+        Rule.required().error("Cliquez sur « Generate » pour créer le slug."),
     }),
     defineField({
       name: "description",
       title: "Description de l'atelier",
       type: "text",
       rows: 8,
-      description: "Texte de présentation commun à toutes les sessions de ce type",
-      validation: (Rule) => Rule.required(),
+      description:
+        "Texte présentant ce type d'atelier (commun à toutes les sessions). Allez à la ligne pour aérer.",
+      group: "essentiels",
+      validation: (Rule) =>
+        Rule.required().error("La description est obligatoire."),
     }),
     defineField({
       name: "images",
-      title: "Images",
+      title: "Photos de l'atelier",
       type: "array",
       of: [{ type: "image", options: { hotspot: true } }],
-      description: "Photos de l'atelier (hero + galerie). La première est utilisée en en-tête.",
+      description:
+        "La 1ʳᵉ photo sert d'image principale (hero). Les suivantes apparaissent dans la galerie.",
+      group: "images",
     }),
     defineField({
       name: "defaultDuration",
       title: "Durée par défaut",
       type: "string",
-      description: "Ex: 2h, 3h30, 1 journée. Peut être modifiée par session si besoin.",
+      description:
+        "Ex. 2h, 3h30, 1 journée. Reprise automatiquement par chaque session, sauf si vous saisissez une durée différente sur la session.",
       placeholder: "2h",
+      group: "defaults",
     }),
     defineField({
       name: "defaultLocation",
       title: "Lieu par défaut",
       type: "string",
-      description: "Lieu habituel. Peut être modifié par session si besoin.",
+      description:
+        "Adresse ou ville habituelle. Reprise automatiquement par chaque session, sauf si vous saisissez un lieu différent sur la session.",
+      group: "defaults",
     }),
   ],
   preview: {
-    select: { title: "title" },
-    prepare({ title }) {
+    select: { title: "title", media: "images.0", slug: "slug.current" },
+    prepare({ title, media, slug }) {
       return {
         title: title || "Sans titre",
-        subtitle: "Type d'atelier (template)",
+        media,
+        subtitle: slug ? `Type — /atelier/${slug}` : "Type d'atelier",
       };
     },
   },

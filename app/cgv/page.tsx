@@ -17,8 +17,6 @@ export default function CGVPage() {
           Document d&apos;information à destination des clientes et clients. Les textes
           visent à refléter des pratiques courantes pour des ateliers créatifs et des
           achats en ligne ; ils ne remplacent pas un conseil juridique personnalisé.
-          Adaptez les coordonnées et détails (SIRET, TVA, adresse) avec votre
-          situation réelle.
         </p>
         <div className="prose prose-lg mx-auto max-w-none text-gray-700">
           <section className="mb-8" id="objet">
@@ -40,18 +38,19 @@ export default function CGVPage() {
           <section className="mb-8" id="identification">
             <h2 className="mb-4 text-2xl font-medium">2. Informations sur le vendeur</h2>
             <p className="mb-4">
-              {/* Renseigner les mentions obligatoires réelles */}
-              <strong>Raison sociale / nom commercial :</strong> Fil & Flow
+              <strong>Nom :</strong> Elisabeth Cartal
               <br />
-              <strong>Adresse :</strong> [à compléter]
+              <strong>Nom commercial :</strong> Fil & Flow
+              <br />
+              <strong>Adresse :</strong> 2500 route du Vercors, 26120 Chabeuil, France
               <br />
               <strong>Contact :</strong> via le{" "}
               <Link href="/contact" className="text-[#6F8F72] underline">
                 formulaire de contact
               </Link>
               <br />
-              <strong>SIRET :</strong> [à compléter] — <strong>TVA :</strong> [le cas
-              échéant, à compléter]
+              <strong>SIRET :</strong> [à compléter par Elisabeth] — <strong>TVA :</strong>{" "}
+              TVA non applicable, art. 293 B du CGI
             </p>
           </section>
 

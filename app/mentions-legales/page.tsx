@@ -19,10 +19,13 @@ export default function MentionsLegalesPage() {
               Le site fil-et-flow.fr est édité par :
             </p>
             <p className="mb-4">
-              {/* À compléter avec les informations réelles */}
-              [Nom de l&apos;artisane]<br />
-              [Adresse complète]<br />
-              [Numéro SIRET si applicable]
+              <strong>Elisabeth Cartal</strong>
+              <br />
+              2500 route du Vercors, 26120 Chabeuil, France
+              <br />
+              <strong>SIRET :</strong> [à compléter par Elisabeth]
+              <br />
+              <strong>Contact :</strong> via le formulaire de contact du site
             </p>
           </section>
 
@@ -31,10 +34,20 @@ export default function MentionsLegalesPage() {
             <p className="mb-4">
               Le site est hébergé par :
             </p>
-              {/* À compléter avec les informations d'hébergement */}
             <p>
-              [Nom de l&apos;hébergeur]<br />
-              [Adresse de l&apos;hébergeur]
+              <strong>Vercel Inc.</strong>
+              <br />
+              340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis
+              <br />
+              Site :{" "}
+              <a
+                href="https://vercel.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#6F8F72] underline"
+              >
+                vercel.com
+              </a>
             </p>
           </section>
 
@@ -73,4 +86,3 @@ export default function MentionsLegalesPage() {
     </div>
   );
 }
-
