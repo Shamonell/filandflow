@@ -23,7 +23,7 @@ export default function MentionsLegalesPage() {
               <br />
               2500 route du Vercors, 26120 Chabeuil, France
               <br />
-              <strong>SIRET :</strong> [à compléter par Elisabeth]
+              <strong>SIRET :</strong> 493 303 069 00022
               <br />
               <strong>Contact :</strong> via le formulaire de contact du site
             </p>

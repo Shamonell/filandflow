@@ -49,7 +49,7 @@ export default function CGVPage() {
                 formulaire de contact
               </Link>
               <br />
-              <strong>SIRET :</strong> [à compléter par Elisabeth] — <strong>TVA :</strong>{" "}
+              <strong>SIRET :</strong> 493 303 069 00022 — <strong>TVA :</strong>{" "}
               TVA non applicable, art. 293 B du CGI
             </p>
           </section>
