@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
-import { setProductStatus } from "@/lib/sanityAdmin";
+import { setProductStatusBySlug } from "@/lib/sanityAdmin";
 
 /** Corps brut requis pour la vérification de signature Stripe */
 export const runtime = "nodejs";
@@ -168,9 +168,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const customerEmail = session.customer_details?.email ?? session.customer_email ?? "Non fourni";
   const customerName = session.customer_details?.name ?? null;
 
-  if (metadata.type === "product" && metadata.productId) {
+  if (metadata.type === "product" && metadata.productSlug) {
     try {
-      await setProductStatus(metadata.productId, "vendu");
+      const result = await setProductStatusBySlug(metadata.productSlug, "vendu");
+      console.log(`Statut "vendu" appliqué à ${result.patched} version(s) du produit "${metadata.productSlug}" (ids: ${result.ids.join(", ")})`);
     } catch (err) {
       console.error("Erreur mise à jour Sanity:", err);
     }
