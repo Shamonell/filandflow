@@ -162,6 +162,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <CheckoutButton
                 type="product"
                 slug={product.slug.current}
+                basePrice={product.price}
                 size="lg"
                 className="flex w-full items-center justify-center gap-2"
               >

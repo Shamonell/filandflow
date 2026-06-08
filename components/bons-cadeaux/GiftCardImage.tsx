@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import SalesTermsModal from "@/components/legal/SalesTermsModal";
+import DeliveryChoiceModal from "@/components/checkout/DeliveryChoiceModal";
+import {
+  GIFT_DELIVERY_OPTIONS,
+  type DeliveryMode,
+} from "@/lib/deliveryOptions";
 
 interface GiftCardImageProps {
   cardId: string;
@@ -25,16 +29,16 @@ export default function GiftCardImage({
   price,
 }: GiftCardImageProps) {
   const [loading, setLoading] = useState(false);
-  const [showTerms, setShowTerms] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
-  const startCheckout = async () => {
+  const startCheckout = async (deliveryMode: DeliveryMode) => {
     if (loading) return;
     setLoading(true);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "gift", giftId: cardId }),
+        body: JSON.stringify({ type: "gift", giftId: cardId, deliveryMode }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -53,7 +57,7 @@ export default function GiftCardImage({
 
   const handleOpen = () => {
     if (loading) return;
-    setShowTerms(true);
+    setShowModal(true);
   };
 
   return (
@@ -94,20 +98,23 @@ export default function GiftCardImage({
             {priceFormatter.format(price)}
           </p>
           <p className="mt-3 text-sm text-[#5F6C72]">
-            Cliquez pour lire les conditions, puis payer en ligne
+            Cliquez pour choisir votre mode de réception et payer en ligne
           </p>
         </div>
       </div>
 
-      <SalesTermsModal
-        open={showTerms}
-        onClose={() => setShowTerms(false)}
-        onConfirm={() => {
-          setShowTerms(false);
-          void startCheckout();
+      <DeliveryChoiceModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={(mode) => {
+          setShowModal(false);
+          void startCheckout(mode);
         }}
+        options={GIFT_DELIVERY_OPTIONS}
+        title="Comment recevoir votre bon cadeau ?"
         termsHref="/cgv#bons-cadeaux"
-        scopePhrase={"l'achat de ce bon cadeau et le paiement sécurisé"}
+        termsScopePhrase="l'achat de ce bon cadeau"
+        basePrice={price}
       />
     </>
   );

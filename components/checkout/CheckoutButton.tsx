@@ -2,12 +2,19 @@
 
 import { useState } from "react";
 import Button from "@/components/ui/Button";
-import SalesTermsModal from "@/components/legal/SalesTermsModal";
+import DeliveryChoiceModal from "@/components/checkout/DeliveryChoiceModal";
+import {
+  PRODUCT_DELIVERY_OPTIONS,
+  GIFT_DELIVERY_OPTIONS,
+  type DeliveryMode,
+} from "@/lib/deliveryOptions";
 
 type CheckoutButtonProps = {
   type: "product" | "gift";
   slug?: string;
   giftId?: string;
+  /** Prix de base (sans frais de port). Utilisé pour afficher le récap dans la modal. */
+  basePrice: number;
   children?: React.ReactNode;
   className?: string;
   size?: "sm" | "md" | "lg";
@@ -17,24 +24,25 @@ export default function CheckoutButton({
   type,
   slug,
   giftId,
+  basePrice,
   children,
   className,
   size = "md",
 }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
-  const [showTerms, setShowTerms] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
-  const startCheckout = async () => {
+  const startCheckout = async (deliveryMode: DeliveryMode) => {
     if (loading) return;
-    const payload =
-      type === "product"
-        ? { type: "product", slug }
-        : { type: "gift", giftId };
-    if ((type === "product" && !slug) || (type === "gift" && !giftId)) {
-      return;
-    }
+    if ((type === "product" && !slug) || (type === "gift" && !giftId)) return;
+
     setLoading(true);
     try {
+      const payload =
+        type === "product"
+          ? { type: "product", slug, deliveryMode }
+          : { type: "gift", giftId, deliveryMode };
+
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,37 +63,44 @@ export default function CheckoutButton({
     }
   };
 
-  const handleOpenTerms = () => {
+  const openModal = () => {
     if (loading) return;
-    setShowTerms(true);
+    setShowModal(true);
   };
 
-  const termsHref = type === "gift" ? "/cgv#bons-cadeaux" : "/cgv#boutique";
-  const scopePhrase =
-    type === "gift"
-      ? "l'achat de ce bon cadeau et le paiement sécurisé"
-      : "l'achat de cette création et le paiement sécurisé";
+  const isGift = type === "gift";
+  const options = isGift ? GIFT_DELIVERY_OPTIONS : PRODUCT_DELIVERY_OPTIONS;
+  const modalTitle = isGift
+    ? "Comment recevoir votre bon cadeau ?"
+    : "Comment recevoir votre commande ?";
+  const termsHref = isGift ? "/cgv#bons-cadeaux" : "/cgv#boutique";
+  const termsScopePhrase = isGift
+    ? "l'achat de ce bon cadeau"
+    : "l'achat de cette création";
 
   return (
     <>
       <Button
         type="button"
-        onClick={handleOpenTerms}
+        onClick={openModal}
         disabled={loading}
         className={className}
         size={size}
       >
         {loading ? "Redirection..." : children ?? "Payer en ligne"}
       </Button>
-      <SalesTermsModal
-        open={showTerms}
-        onClose={() => setShowTerms(false)}
-        onConfirm={() => {
-          setShowTerms(false);
-          void startCheckout();
+      <DeliveryChoiceModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={(mode) => {
+          setShowModal(false);
+          void startCheckout(mode);
         }}
+        options={options}
+        title={modalTitle}
         termsHref={termsHref}
-        scopePhrase={scopePhrase}
+        termsScopePhrase={termsScopePhrase}
+        basePrice={basePrice}
       />
     </>
   );

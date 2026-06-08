@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { getProductBySlug, getGiftCardByShopId } from "@/lib/queries";
+import {
+  PRODUCT_DELIVERY_OPTIONS,
+  GIFT_DELIVERY_OPTIONS,
+  getDeliveryOption,
+  type DeliveryMode,
+} from "@/lib/deliveryOptions";
 
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
@@ -12,15 +19,57 @@ function getBaseUrl(): string {
   return "http://localhost:3000";
 }
 
+/** Convertit un montant en euros en options de livraison Stripe (centimes). */
+function buildShippingRate(
+  label: string,
+  priceEuros: number
+): Stripe.Checkout.SessionCreateParams.ShippingOption {
+  return {
+    shipping_rate_data: {
+      type: "fixed_amount",
+      display_name: label,
+      fixed_amount: {
+        amount: Math.round(priceEuros * 100),
+        currency: "eur",
+      },
+    },
+  };
+}
+
+/** Custom field téléphone obligatoire pour les retraits à l'atelier. */
+function buildPhoneField(): Stripe.Checkout.SessionCreateParams.CustomField {
+  return {
+    key: "phone",
+    label: {
+      type: "custom",
+      custom: "Numéro de téléphone (pour vous prévenir quand c'est prêt)",
+    },
+    type: "text",
+    text: {
+      minimum_length: 8,
+      maximum_length: 20,
+    },
+    optional: false,
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { type, slug, giftId } = body;
+    const { type, slug, giftId, deliveryMode } = body as {
+      type?: "product" | "gift";
+      slug?: string;
+      giftId?: string;
+      deliveryMode?: DeliveryMode;
+    };
 
     const baseUrl = getBaseUrl();
     const successUrl = `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = baseUrl + (type === "gift" ? "/bons-cadeaux" : "/boutique");
 
+    // ─────────────────────────────────────────────
+    // PRODUITS BOUTIQUE
+    // ─────────────────────────────────────────────
     if (type === "product" && slug) {
       const product = await getProductBySlug(slug);
       if (!product) {
@@ -36,8 +85,23 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Validation du mode de livraison côté serveur (jamais faire confiance au front).
+      const deliveryOption = deliveryMode
+        ? getDeliveryOption(PRODUCT_DELIVERY_OPTIONS, deliveryMode)
+        : null;
+      if (
+        !deliveryOption ||
+        deliveryOption.disabled ||
+        !["retrait", "colissimo"].includes(deliveryMode!)
+      ) {
+        return NextResponse.json(
+          { error: "Mode de livraison invalide" },
+          { status: 400 }
+        );
+      }
+
       const stripe = getStripe();
-      const session = await stripe.checkout.sessions.create({
+      const sessionParams: Stripe.Checkout.SessionCreateParams = {
         mode: "payment",
         line_items: [
           {
@@ -50,7 +114,6 @@ export async function POST(request: NextRequest) {
                   typeof product.description === "string"
                     ? product.description.slice(0, 500)
                     : undefined,
-                images: [], // optionnel : ajouter image URL si besoin
               },
               unit_amount: Math.round(product.price * 100),
             },
@@ -58,17 +121,29 @@ export async function POST(request: NextRequest) {
         ],
         success_url: successUrl,
         cancel_url: cancelUrl,
-        shipping_address_collection: {
-          allowed_countries: ["FR"],
-        },
         metadata: {
           type: "product",
           productSlug: product.slug.current,
           productId: product._id,
           productTitle: product.title,
+          deliveryMode: String(deliveryMode),
         },
-      });
+      };
 
+      if (deliveryMode === "colissimo") {
+        // Envoi domicile : adresse collectée + shipping rate Colissimo
+        sessionParams.shipping_address_collection = {
+          allowed_countries: ["FR"],
+        };
+        sessionParams.shipping_options = [
+          buildShippingRate("Colissimo domicile", deliveryOption.price),
+        ];
+      } else {
+        // Retrait Chabeuil : pas d'adresse, mais téléphone obligatoire
+        sessionParams.custom_fields = [buildPhoneField()];
+      }
+
+      const session = await stripe.checkout.sessions.create(sessionParams);
       if (!session.url) {
         return NextResponse.json(
           { error: "Impossible de créer la session de paiement" },
@@ -78,6 +153,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ url: session.url });
     }
 
+    // ─────────────────────────────────────────────
+    // BONS CADEAUX
+    // ─────────────────────────────────────────────
     if (type === "gift" && giftId) {
       const gift = await getGiftCardByShopId(giftId);
       if (!gift) {
@@ -87,8 +165,22 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      const deliveryOption = deliveryMode
+        ? getDeliveryOption(GIFT_DELIVERY_OPTIONS, deliveryMode)
+        : null;
+      if (
+        !deliveryOption ||
+        deliveryOption.disabled ||
+        !["email", "retrait", "courrier"].includes(deliveryMode!)
+      ) {
+        return NextResponse.json(
+          { error: "Mode de réception invalide" },
+          { status: 400 }
+        );
+      }
+
       const stripe = getStripe();
-      const session = await stripe.checkout.sessions.create({
+      const sessionParams: Stripe.Checkout.SessionCreateParams = {
         mode: "payment",
         line_items: [
           {
@@ -109,9 +201,26 @@ export async function POST(request: NextRequest) {
           type: "gift",
           giftId: gift.id,
           giftTitle: gift.title,
+          deliveryMode: String(deliveryMode),
         },
-      });
+      };
 
+      if (deliveryMode === "courrier") {
+        sessionParams.shipping_address_collection = {
+          allowed_countries: ["FR"],
+        };
+        sessionParams.shipping_options = [
+          buildShippingRate(
+            "Envoi par courrier (carte papier)",
+            deliveryOption.price
+          ),
+        ];
+      } else if (deliveryMode === "retrait") {
+        sessionParams.custom_fields = [buildPhoneField()];
+      }
+      // email : rien de spécial, juste l'email obligatoire collecté par défaut
+
+      const session = await stripe.checkout.sessions.create(sessionParams);
       if (!session.url) {
         return NextResponse.json(
           { error: "Impossible de créer la session de paiement" },
@@ -122,7 +231,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Paramètres invalides (type + slug ou type + giftId requis)" },
+      {
+        error:
+          "Paramètres invalides (type + slug/giftId + deliveryMode requis)",
+      },
       { status: 400 }
     );
   } catch (err) {
