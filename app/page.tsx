@@ -75,7 +75,7 @@ export default async function Home() {
               <div className="group rounded-lg bg-white px-16 py-8 shadow-sm">
                 <div className="mb-4 flex justify-center">
                   <Image
-                    src="/atelier guidé.png"
+                    src="/atelier-guide.png"
                     alt="Illustration d'un accompagnement créatif pas à pas"
                     width={280}
                     height={180}

@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { getEvents, Event } from "@/lib/queries";
+import { getAnnouncements, getEvents, Event } from "@/lib/queries";
+import AnnouncementGrid from "@/components/announcements/AnnouncementGrid";
 import ContactButton from "@/components/ui/ContactButton";
 import MonthCard from "@/components/ateliers/MonthCard";
 import { parseISO } from "date-fns";
@@ -85,6 +86,9 @@ export default async function AteliersPage() {
     events = [];
   }
 
+  // Les annonces ne doivent pas faire tomber la page si Sanity répond mal.
+  const announcements = await getAnnouncements();
+
   const eventsByMonth = groupEventsByMonth(events);
 
   return (
@@ -96,6 +100,16 @@ export default async function AteliersPage() {
             Planning des ateliers
           </h1>
         </div>
+
+        {/* Annonces : les affiches publiées telles quelles, avant le planning */}
+        {announcements.length > 0 && (
+          <section className="mb-20">
+            <h2 className="mb-8 font-serif text-2xl font-light text-[#5C3A21] md:text-3xl">
+              À l&apos;affiche
+            </h2>
+            <AnnouncementGrid announcements={announcements} />
+          </section>
+        )}
 
         {/* Grille de cartes mensuelles */}
         {events.length === 0 ? (

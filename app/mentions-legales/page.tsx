@@ -16,7 +16,7 @@ export default function MentionsLegalesPage() {
           <section className="mb-8">
             <h2 className="mb-4 text-2xl font-medium">1. Éditeur du site</h2>
             <p className="mb-4">
-              Le site fil-et-flow.fr est édité par :
+              Le site filandflow.fr est édité par :
             </p>
             <p className="mb-4">
               <strong>Elisabeth Cartal</strong>

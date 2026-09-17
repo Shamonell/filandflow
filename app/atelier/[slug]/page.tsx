@@ -5,6 +5,7 @@ import { getEventBySlug, getEvents } from "@/lib/queries";
 import { urlFor } from "@/lib/sanity";
 import Button from "@/components/ui/Button";
 import WorkshopSalesTermsButtons from "@/components/atelier/WorkshopSalesTermsButtons";
+import { contactFormLink, whatsappLink } from "@/lib/contact";
 import { cn } from "@/lib/utils";
 import {
   formatEventInParis,
@@ -78,14 +79,14 @@ export default async function EventPage({ params }: EventPageProps) {
     full: "bg-red-50/90 text-red-700 border-red-300 font-semibold",
   };
 
-  const whatsappNumber =
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "33600000000";
+  // Contacts : voir lib/contact.ts. Les liens WhatsApp valent null tant qu'aucun
+  // numéro réel n'est configuré, et les boutons ne sont alors pas affichés.
   const inscriptionMessage = `Bonjour Elisabeth,\n\nJe souhaite m'inscrire à l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nPourriez-vous me confirmer s'il reste des places disponibles ?\n\nMerci !`;
-  const signupWhatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(inscriptionMessage)}`;
-  const signupContactUrl = `/contact?message=${encodeURIComponent(inscriptionMessage)}`;
+  const signupWhatsappUrl = whatsappLink(inscriptionMessage);
+  const signupContactUrl = contactFormLink(inscriptionMessage);
   const waitlistMessage = `Bonjour Elisabeth,\n\nJe souhaite être ajouté(e) à la liste d'attente pour l'atelier "${display.title}" prévu le ${formattedDate} à ${formattedTime}.\n\nMerci !`;
-  const waitlistWhatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waitlistMessage)}`;
-  const waitlistContactUrl = `/contact?message=${encodeURIComponent(waitlistMessage)}`;
+  const waitlistWhatsappUrl = whatsappLink(waitlistMessage);
+  const waitlistContactUrl = contactFormLink(waitlistMessage);
 
   const heroImage = display.images?.[0];
   const galleryImages = (display.images?.length

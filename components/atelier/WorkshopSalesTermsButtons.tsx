@@ -9,9 +9,11 @@ import SalesTermsModal from "@/components/legal/SalesTermsModal";
 type Channel = "whatsapp" | "email" | null;
 
 type WorkshopSalesTermsButtonsProps = {
-  signupWhatsappUrl: string;
+  /** null quand aucun numéro WhatsApp n'est configuré : le bouton est alors masqué. */
+  signupWhatsappUrl: string | null;
   signupContactUrl: string;
-  waitlistWhatsappUrl: string;
+  /** null quand aucun numéro WhatsApp n'est configuré : le bouton est alors masqué. */
+  waitlistWhatsappUrl: string | null;
   waitlistContactUrl: string;
   showSignup: boolean;
   showWaitlist: boolean;
@@ -43,6 +45,7 @@ export default function WorkshopSalesTermsButtons({
     const mail = phase === "signup" ? signupContactUrl : waitlistContactUrl;
     close();
     if (channel === "whatsapp") {
+      if (!wa) return;
       window.open(wa, "_blank", "noopener,noreferrer");
     } else {
       window.location.href = mail;
@@ -66,28 +69,30 @@ export default function WorkshopSalesTermsButtons({
             de l&apos;atelier.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <button
-              type="button"
-              onClick={() => open("signup", "whatsapp")}
-              className="inline-flex justify-center"
-            >
-              <span className="inline-flex">
-                <Button
-                  size="lg"
-                  className="flex items-center gap-2 bg-[#6F8F72] text-white hover:bg-[#5A726D]"
-                >
-                  <Image
-                    src="/icone whatapp.PNG"
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="h-5 w-5 object-contain"
-                    aria-hidden
-                  />
-                  Je m&apos;inscris par WhatsApp
-                </Button>
-              </span>
-            </button>
+            {signupWhatsappUrl && (
+              <button
+                type="button"
+                onClick={() => open("signup", "whatsapp")}
+                className="inline-flex justify-center"
+              >
+                <span className="inline-flex">
+                  <Button
+                    size="lg"
+                    className="flex items-center gap-2 bg-[#6F8F72] text-white hover:bg-[#5A726D]"
+                  >
+                    <Image
+                      src="/icone whatapp.PNG"
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 object-contain"
+                      aria-hidden
+                    />
+                    Je m&apos;inscris par WhatsApp
+                  </Button>
+                </span>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => open("signup", "email")}
@@ -128,27 +133,29 @@ export default function WorkshopSalesTermsButtons({
             d&apos;attente.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <button
-              type="button"
-              onClick={() => open("waitlist", "whatsapp")}
-              className="inline-flex justify-center"
-            >
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-red-300 text-red-700 hover:bg-red-100"
+            {waitlistWhatsappUrl && (
+              <button
+                type="button"
+                onClick={() => open("waitlist", "whatsapp")}
+                className="inline-flex justify-center"
               >
-                <Image
-                  src="/icone whatapp.PNG"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="mr-2 inline h-5 w-5 object-contain"
-                  aria-hidden
-                />
-                Me contacter par WhatsApp
-              </Button>
-            </button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-red-300 text-red-700 hover:bg-red-100"
+                >
+                  <Image
+                    src="/icone whatapp.PNG"
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="mr-2 inline h-5 w-5 object-contain"
+                    aria-hidden
+                  />
+                  Me contacter par WhatsApp
+                </Button>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => open("waitlist", "email")}

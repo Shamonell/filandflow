@@ -88,8 +88,42 @@ export default function Header() {
           </button>
         </div>
         
+        {/*
+          Adresse de l'atelier, entre le titre et le menu.
+          Beaucoup de visiteurs ne savent pas où se trouve Fil & Flow : le lien
+          ouvre directement l'itinéraire. Visible aussi sur mobile, où le titre
+          « Fil & Flow » est masqué.
+        */}
+        <div className="mb-1 flex justify-center">
+          <a
+            href="https://www.google.com/maps/search/?api=1&query=2500+route+du+Vercors+26120+Chabeuil"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-1.5 text-xs tracking-wide text-[#5F6C72] transition-colors hover:text-[#6F8F72] md:text-sm"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-3.5 w-3.5 flex-shrink-0 text-[#6F8F72]"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 21s7-5.686 7-11a7 7 0 10-14 0c0 5.314 7 11 7 11z"
+              />
+              <circle cx="12" cy="10" r="2.5" />
+            </svg>
+            <span className="group-hover:underline">
+              2500 route du Vercors, 26120 Chabeuil
+            </span>
+          </a>
+        </div>
+
         {/* Ligne 2 : Menu Desktop centré */}
-        <nav className="hidden md:flex items-center justify-center -mt-2">
+        <nav className="hidden md:flex items-center justify-center">
             <ul className="flex gap-6">
               <li>
                 <Link

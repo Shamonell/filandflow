@@ -93,9 +93,11 @@ export async function POST(request: NextRequest) {
 
     // Si Resend est configuré, utiliser Resend
     const resendApiKey = process.env.RESEND_API_KEY;
-    const recipientEmail = process.env.CONTACT_EMAIL || "contact@example.com";
+    // Pas de repli sur une adresse d'exemple : un message envoyé à
+    // contact@example.com est un message perdu, sans que personne le sache.
+    const recipientEmail = process.env.CONTACT_EMAIL;
 
-    if (resendApiKey) {
+    if (resendApiKey && recipientEmail) {
       try {
         // Utiliser Resend pour envoyer l'email
         const { Resend } = await import("resend");
@@ -132,23 +134,43 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Mode développement : simuler l'envoi
-    // En production, vous devriez configurer RESEND_API_KEY
+    // Arrivé ici, l'envoi n'est pas configuré (RESEND_API_KEY ou CONTACT_EMAIL
+    // manquante), ou l'import de Resend a échoué.
     const isDevelopment = process.env.NODE_ENV === "development";
-    
-    console.log("=== NOUVEAU MESSAGE DE CONTACT ===");
-    console.log("De:", email);
-    console.log("Message:", message);
-    console.log("===================================");
+
+    if (isDevelopment) {
+      // En local, on simule : pas de clé d'API, et ce n'est pas un vrai visiteur.
+      console.log("=== NOUVEAU MESSAGE DE CONTACT (simulé) ===");
+      console.log("De:", email);
+      console.log("Message:", message);
+      console.log("===========================================");
+
+      return NextResponse.json(
+        { success: true, message: "Message reçu (mode développement - email non envoyé)" },
+        { status: 200 }
+      );
+    }
+
+    // En production, ne JAMAIS répondre « Message reçu » sans avoir envoyé quoi
+    // que ce soit. C'est ce que faisait la version précédente : le visiteur
+    // repartait confiant et le message n'existait nulle part.
+    // On compte les variables manquantes sans jamais recopier leur valeur.
+    console.error(
+      "Formulaire de contact non configuré:",
+      [
+        !resendApiKey ? "RESEND_API_KEY absente" : null,
+        !recipientEmail ? "CONTACT_EMAIL absente" : null,
+      ]
+        .filter(Boolean)
+        .join(", ") || "import Resend impossible"
+    );
 
     return NextResponse.json(
       {
-        success: true,
-        message: isDevelopment
-          ? "Message reçu (mode développement - email non envoyé)"
-          : "Message reçu. Nous vous répondrons dans les plus brefs délais.",
+        error:
+          "L'envoi du message est momentanément indisponible. Vous pouvez nous joindre directement par WhatsApp.",
       },
-      { status: 200 }
+      { status: 503 }
     );
   } catch (error) {
     console.error("Erreur serveur:", error);

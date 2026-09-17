@@ -1,10 +1,13 @@
 import { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug, getProducts } from "@/lib/queries";
 import { urlFor } from "@/lib/sanity";
 import Button from "@/components/ui/Button";
 import CheckoutButton from "@/components/checkout/CheckoutButton";
+import ProductGallery, { type GalleryPhoto } from "@/components/products/ProductGallery";
+import { contactFormLink, whatsappLink } from "@/lib/contact";
 import { cn } from "@/lib/utils";
 
 interface ProductPageProps {
@@ -55,10 +58,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const mainImage = product.images?.[0];
-  const imageUrl = mainImage
-    ? urlFor(mainImage).width(800).height(800).format("webp").url()
-    : null;
+  // Toutes les photos alimentent la galerie, plus seulement les cinq premières.
+  // Les trois tailles sont calculées ici, côté serveur : le composant de galerie
+  // est client et ne doit pas embarquer le client Sanity.
+  const photos: GalleryPhoto[] = (product.images ?? []).map((image, index) => ({
+    src: urlFor(image).width(1000).height(1000).format("webp").url(),
+    thumb: urlFor(image).width(240).height(240).format("webp").url(),
+    full: urlFor(image).width(1800).format("webp").url(),
+    alt: index === 0 ? product.title : `${product.title} — photo ${index + 1}`,
+  }));
 
   const statusColors = {
     disponible: "bg-green-100 text-green-800",
@@ -67,63 +75,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
     vendu: "bg-gray-100 text-gray-800",
   };
 
-  // Configuration des contacts via variables d'environnement
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "33600000000";
-  const whatsappMessage = encodeURIComponent(
-    `Bonjour, je suis intéressé(e) par "${product.title}". Pourriez-vous me donner plus d'informations ?`
-  );
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
-
-  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@fil-et-flow.fr";
-  const emailSubject = encodeURIComponent(`Demande d'information - ${product.title}`);
-  const emailBody = encodeURIComponent(
-    `Bonjour,\n\nJe suis intéressé(e) par votre création "${product.title}".\n\nPourriez-vous me donner plus d'informations ?\n\nMerci !`
-  );
-  const emailUrl = `mailto:${contactEmail}?subject=${emailSubject}&body=${emailBody}`;
+  // Contacts : voir lib/contact.ts. Le lien WhatsApp vaut null tant qu'aucun
+  // numéro réel n'est configuré, et le bouton n'est alors pas affiché.
+  const enquiry = `Bonjour,\n\nJe suis intéressé(e) par votre création "${product.title}".\n\nPourriez-vous me donner plus d'informations ?\n\nMerci !`;
+  const whatsappUrl = whatsappLink(enquiry);
+  const contactUrl = contactFormLink(enquiry);
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Images */}
-        <div className="space-y-4">
-          {imageUrl ? (
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-primary-50">
-              <Image
-                src={imageUrl}
-                alt={product.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
-            </div>
-          ) : (
-            <div className="flex aspect-square items-center justify-center rounded-lg bg-primary-50 text-gray-400">
-              Aucune image disponible
-            </div>
-          )}
-          {product.images && product.images.length > 1 && (
-            <div className="grid grid-cols-4 gap-4">
-              {product.images.slice(1, 5).map((image, index) => {
-                const thumbUrl = urlFor(image).width(200).height(200).format("webp").url();
-                return (
-                  <div
-                    key={index}
-                    className="relative aspect-square overflow-hidden rounded-lg bg-primary-50"
-                  >
-                    <Image
-                      src={thumbUrl}
-                      alt={`${product.title} - Vue ${index + 2}`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 25vw, 12.5vw"
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        <ProductGallery photos={photos} title={product.title} />
 
         {/* Informations */}
         <div className="space-y-6">
@@ -157,29 +119,50 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           )}
 
+          {/*
+            Conteneur en flex : les liens étaient des éléments inline, sur
+            lesquels la marge verticale de `space-y-3` n'avait aucun effet.
+            Les trois boutons apparaissaient donc collés. En flex, les liens
+            sont transformés en blocs et `gap` s'applique réellement.
+          */}
           {product.status === "disponible" && (
-            <div className="space-y-3 pt-4">
+            <div className="flex flex-col gap-5 pt-6">
               <CheckoutButton
                 type="product"
                 slug={product.slug.current}
                 basePrice={product.price}
+                itemLabel={product.title}
                 size="lg"
                 className="flex w-full items-center justify-center gap-2"
               >
                 Acheter — {product.price.toFixed(2)} €
               </CheckoutButton>
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" className="flex w-full items-center justify-center gap-3">
-                  <Image src="/icone whatapp.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
-                  Contacter par WhatsApp
-                </Button>
-              </a>
-              <a href={emailUrl}>
-                <Button variant="outline" className="flex w-full items-center justify-center gap-3">
-                  <Image src="/icone lettre coeur.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
-                  Envoyer un e-mail
-                </Button>
-              </a>
+
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-4 pb-1" aria-hidden>
+                  <span className="h-px flex-1 bg-heading/12" />
+                  <span className="text-[0.7rem] uppercase tracking-[0.2em] text-text-secondary">
+                    ou une question
+                  </span>
+                  <span className="h-px flex-1 bg-heading/12" />
+                </div>
+
+                {whatsappUrl && (
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block">
+                    <Button variant="outline" className="flex w-full items-center justify-center gap-3">
+                      <Image src="/icone whatapp.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
+                      Contacter par WhatsApp
+                    </Button>
+                  </a>
+                )}
+
+                <Link href={contactUrl} className="block">
+                  <Button variant="outline" className="flex w-full items-center justify-center gap-3">
+                    <Image src="/icone lettre coeur.PNG" alt="" width={20} height={20} className="h-5 w-5 object-contain" aria-hidden />
+                    Écrire un message
+                  </Button>
+                </Link>
+              </div>
             </div>
           )}
 

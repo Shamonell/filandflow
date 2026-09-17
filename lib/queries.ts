@@ -2,6 +2,7 @@ import { groq } from "next-sanity";
 import { SanityImageSource } from "@sanity/image-url/lib/types/types";
 import { client, urlFor } from "./sanity";
 import { giftCardsFallbackAsOffers, type GiftCardOffer } from "./gift-cards";
+import { HOME_WORKSHOPS_FALLBACK, type HomeWorkshop } from "./home-workshops";
 
 // Query pour récupérer tous les produits (uniquement les documents publiés, pas les drafts)
 export const productsQuery = groq`
@@ -271,3 +272,130 @@ export async function getGiftCardByShopId(
 }
 
 export type { GiftCardOffer };
+
+// --- Annonces (affiches) -----------------------------------------------------
+
+export interface Announcement {
+  id: string;
+  title: string;
+  summary?: string;
+  dateStart: string;
+  dateEnd?: string;
+  /** Affiche en pleine résolution, non recadrée. */
+  imageUrl: string;
+  /** Largeur et hauteur réelles, pour réserver la place et éviter tout décalage. */
+  width: number;
+  height: number;
+}
+
+export const announcementsQuery = groq`
+  *[_type == "announcement" && !(_id in path("drafts.**")) && isActive != false
+    && (!defined(dateEnd) || dateEnd >= $today)
+  ] | order(dateStart asc) {
+    _id,
+    title,
+    summary,
+    dateStart,
+    dateEnd,
+    image,
+    "dimensions": image.asset->metadata.dimensions
+  }
+`;
+
+/**
+ * Annonces à venir ou en cours. Une annonce dont la date de fin est passée
+ * disparaît d'elle-même : Elisabeth n'a rien à dépublier.
+ */
+export async function getAnnouncements(): Promise<Announcement[]> {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    const rows = await client.fetch<
+      Array<{
+        _id: string;
+        title: string;
+        summary?: string | null;
+        dateStart: string;
+        dateEnd?: string | null;
+        image?: SanityImageSource | null;
+        dimensions?: { width?: number; height?: number } | null;
+      }>
+    >(announcementsQuery, { today });
+
+    return (rows ?? [])
+      .filter((row) => row.image)
+      .map((row) => ({
+        id: row._id,
+        title: row.title,
+        summary: row.summary || undefined,
+        dateStart: row.dateStart,
+        dateEnd: row.dateEnd || undefined,
+        imageUrl: urlFor(row.image!).width(1400).format("webp").url(),
+        // 1080x1350 est le format des visuels Facebook/Instagram d'Elisabeth.
+        width: row.dimensions?.width ?? 1080,
+        height: row.dimensions?.height ?? 1350,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+// --- Exemples d'ateliers de /ateliers-chez-vous ------------------------------
+
+export const homeWorkshopsQuery = groq`
+  *[_type == "homeWorkshop" && !(_id in path("drafts.**")) && isActive != false]
+    | order(sortOrder asc, title asc) {
+    _id,
+    title,
+    description,
+    slug,
+    duration,
+    price,
+    image,
+    legacyImagePath
+  }
+`;
+
+/**
+ * Exemples d'ateliers affichés sur /ateliers-chez-vous.
+ * Repli sur la liste codée en dur tant qu'aucun document n'est publié : la page
+ * ne doit jamais se retrouver vide pendant la bascule vers le Studio.
+ */
+export async function getHomeWorkshops(): Promise<HomeWorkshop[]> {
+  try {
+    const rows = await client.fetch<
+      Array<{
+        _id: string;
+        title: string;
+        description?: string | null;
+        slug?: { current?: string } | null;
+        duration?: string | null;
+        price?: number | null;
+        image?: SanityImageSource | null;
+        legacyImagePath?: string | null;
+      }>
+    >(homeWorkshopsQuery);
+
+    if (!rows?.length) return HOME_WORKSHOPS_FALLBACK;
+
+    return rows.map((row) => {
+      let imagePath = "";
+      if (row.image) {
+        imagePath = urlFor(row.image).width(900).format("webp").url();
+      } else if (row.legacyImagePath?.trim()) {
+        imagePath = row.legacyImagePath.trim();
+      }
+
+      return {
+        id: row.slug?.current || row._id,
+        title: row.title,
+        description: row.description || undefined,
+        duration: row.duration || undefined,
+        price: row.price != null ? `${row.price}€` : undefined,
+        imagePath,
+        imageAlt: row.title,
+      };
+    });
+  } catch {
+    return HOME_WORKSHOPS_FALLBACK;
+  }
+}

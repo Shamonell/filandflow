@@ -4,13 +4,19 @@ import Image from "next/image";
 import Button from "@/components/ui/Button";
 import WorkshopCard from "@/components/ateliers-chez-vous/WorkshopCard";
 import ConceptFeature from "@/components/ateliers-chez-vous/ConceptFeature";
+import { getHomeWorkshops } from "@/lib/queries";
 
 export const metadata: Metadata = {
   title: "Parenthèses à la maison - Fil & Flow",
   description: "L'art de transformer du fil en chef-d'œuvre. Ateliers couture à domicile dans la Drôme, ambiance conviviale et bienveillante.",
 };
 
-export default function AteliersChezVousPage() {
+// ISR : les exemples d'ateliers sont éditables depuis le Studio.
+export const revalidate = 60;
+
+export default async function AteliersChezVousPage() {
+  const workshops = await getHomeWorkshops();
+
   return (
     <div className="bg-[#FBF8F3]">
       {/* Section HERO */}
@@ -148,35 +154,19 @@ export default function AteliersChezVousPage() {
               Exemples d&apos;ateliers proposés
             </h2>
 
+            {/* Gérés depuis le Studio (type « Atelier chez vous »). */}
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-2">
-              <WorkshopCard
-                title="Pochette-sac"
-                duration="4h"
-                price="65€"
-                imagePath="/ateliers-chez-vous/texas.jpg"
-                imageAlt="Pochette-sac"
-              />
-              <WorkshopCard
-                title="Pochette en chutes de tissus avec étiquette brodée"
-                duration="2h30"
-                price="50€"
-                imagePath="/ateliers-chez-vous/pochette-chutes.jpg"
-                imageAlt="Pochette en chutes de tissus avec étiquette brodée"
-              />
-              <WorkshopCard
-                title="Housse de coussin patchwork zippée"
-                duration="2h30"
-                price="40€"
-                imagePath="/ateliers-chez-vous/housse-coussin.jpg"
-                imageAlt="Housse de coussin patchwork zippée"
-              />
-              <WorkshopCard
-                title="Besace"
-                duration="4h30"
-                price="65€"
-                imagePath="/ateliers-chez-vous/besace-nelson.jpg"
-                imageAlt="Besace"
-              />
+              {workshops.map((workshop) => (
+                <WorkshopCard
+                  key={workshop.id}
+                  title={workshop.title}
+                  description={workshop.description}
+                  duration={workshop.duration}
+                  price={workshop.price}
+                  imagePath={workshop.imagePath}
+                  imageAlt={workshop.imageAlt}
+                />
+              ))}
             </div>
           </div>
         </div>

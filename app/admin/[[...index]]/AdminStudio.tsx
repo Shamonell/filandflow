@@ -8,6 +8,8 @@ import product from '../../../sanity/schemas/product'
 import event from '../../../sanity/schemas/event'
 import workshopTemplate from '../../../sanity/schemas/workshopTemplate'
 import giftCard from '../../../sanity/schemas/giftCard'
+import homeWorkshop from '../../../sanity/schemas/homeWorkshop'
+import announcement from '../../../sanity/schemas/announcement'
 
 export default function AdminStudio() {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
@@ -27,7 +29,7 @@ export default function AdminStudio() {
       basePath: '/admin',
       plugins: [structureTool()],
       schema: {
-        types: [product, event, workshopTemplate, giftCard] as any,
+        types: [product, event, workshopTemplate, giftCard, homeWorkshop, announcement] as any,
       },
     })
   }, [projectId, dataset])

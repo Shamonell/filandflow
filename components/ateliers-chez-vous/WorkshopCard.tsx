@@ -5,14 +5,18 @@ import { useState } from "react";
 
 interface WorkshopCardProps {
   title: string;
-  duration: string;
-  price: string;
+  /** Une ou deux phrases, saisies dans le Studio. */
+  description?: string;
+  /** Facultatifs : vides quand la durée ou le tarif dépendent du groupe. */
+  duration?: string;
+  price?: string;
   imagePath: string;
   imageAlt: string;
 }
 
 export default function WorkshopCard({
   title,
+  description,
   duration,
   price,
   imagePath,
@@ -24,7 +28,9 @@ export default function WorkshopCard({
     <div className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
       {/* Image dominante */}
       <div className="relative h-64 w-full md:h-72">
-        {imageError ? (
+        {/* Un chemin vide viendrait d'un document Sanity sans photo : on affiche
+            directement le repli plutôt que de passer une src vide à next/image. */}
+        {imageError || !imagePath?.trim() ? (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#EEF4EE] to-[#d9ead9]">
             <span className="text-lg text-[#6F8F72]">{title}</span>
           </div>
@@ -43,10 +49,16 @@ export default function WorkshopCard({
       {/* Contenu texte */}
       <div className="p-6">
         <h3 className="mb-3 text-2xl font-light text-[#5C3A21] md:text-3xl">{title}</h3>
-        <div className="flex items-center justify-between text-base text-[#5F6C72] md:text-lg">
-          <span>{duration}</span>
-          <span className="font-medium text-[#6F8F72]">{price}</span>
-        </div>
+        {description && (
+          <p className="mb-4 text-base leading-relaxed text-[#5F6C72]">{description}</p>
+        )}
+        {/* Durée et tarif sont facultatifs : la ligne disparaît si les deux manquent. */}
+        {(duration || price) && (
+          <div className="flex items-center justify-between text-base text-[#5F6C72] md:text-lg">
+            <span>{duration}</span>
+            <span className="font-medium text-[#6F8F72]">{price}</span>
+          </div>
+        )}
       </div>
     </div>
   );
