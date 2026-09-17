@@ -93,9 +93,16 @@ export async function POST(request: NextRequest) {
 
     // Si Resend est configuré, utiliser Resend
     const resendApiKey = process.env.RESEND_API_KEY;
+    // Destinataire : CONTACT_EMAIL, sinon l'adresse publique du site.
     // Pas de repli sur une adresse d'exemple : un message envoyé à
     // contact@example.com est un message perdu, sans que personne le sache.
-    const recipientEmail = process.env.CONTACT_EMAIL;
+    // Le second repli évite qu'un CONTACT_EMAIL absent coupe un formulaire
+    // qui fonctionnait — les deux variables pointent de toute façon vers la
+    // même boîte.
+    const recipientEmail =
+      process.env.CONTACT_EMAIL?.trim() ||
+      process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() ||
+      undefined;
 
     if (resendApiKey && recipientEmail) {
       try {
@@ -159,7 +166,9 @@ export async function POST(request: NextRequest) {
       "Formulaire de contact non configuré:",
       [
         !resendApiKey ? "RESEND_API_KEY absente" : null,
-        !recipientEmail ? "CONTACT_EMAIL absente" : null,
+        !recipientEmail
+          ? "CONTACT_EMAIL et NEXT_PUBLIC_CONTACT_EMAIL absentes"
+          : null,
       ]
         .filter(Boolean)
         .join(", ") || "import Resend impossible"
