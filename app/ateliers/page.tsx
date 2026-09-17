@@ -111,17 +111,24 @@ export default async function AteliersPage() {
           </section>
         )}
 
-        {/* Grille de cartes mensuelles */}
+        {/*
+          Grille de cartes mensuelles.
+          Le message « aucun atelier programmé » ne doit apparaître que si la
+          page est réellement vide : avec des affiches juste au-dessus, il
+          contredisait ce que le visiteur venait de lire.
+        */}
         {events.length === 0 ? (
-          <div className="rounded-lg bg-[#EEF4EE] p-12 text-center">
-            <p className="text-lg text-[#5F6C72]">
-              Aucun atelier programmé pour le moment.
-            </p>
-            <p className="mt-4 text-[#5F6C72]">
-              N&apos;hésitez pas à me contacter pour être informé(e) des
-              prochaines dates.
-            </p>
-          </div>
+          announcements.length > 0 ? null : (
+            <div className="rounded-lg bg-[#EEF4EE] p-12 text-center">
+              <p className="text-lg text-[#5F6C72]">
+                Aucun atelier programmé pour le moment.
+              </p>
+              <p className="mt-4 text-[#5F6C72]">
+                N&apos;hésitez pas à me contacter pour être informé(e) des
+                prochaines dates.
+              </p>
+            </div>
+          )
         ) : eventsByMonth.length === 0 ? (
           <div className="rounded-lg bg-[#EEF4EE] p-12 text-center">
             <p className="text-lg text-[#5F6C72]">

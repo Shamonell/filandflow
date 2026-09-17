@@ -4,9 +4,21 @@ import { useState, FormEvent, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
+import {
+  WORKSHOP_ADDRESS,
+  WORKSHOP_MAP_URL,
+  getContactEmail,
+  getDisplayPhone,
+  telLink,
+} from "@/lib/contact";
 
 function ContactForm() {
   const searchParams = useSearchParams();
+  // Coordonnées : absentes de l'affichage si non configurées, jamais de repli
+  // vers un numéro ou une adresse fictive.
+  const displayPhone = getDisplayPhone();
+  const phoneHref = telLink();
+  const contactEmail = getContactEmail();
   const [formData, setFormData] = useState({
     email: "",
     message: "",
@@ -78,6 +90,59 @@ function ContactForm() {
               <br />
               Je serais ravie d&apos;échanger avec vous.
             </p>
+
+            {/*
+              Coordonnées directes. Le formulaire seul ne suffit pas : beaucoup
+              de visiteurs préfèrent appeler, et l'adresse est l'information la
+              plus demandée.
+            */}
+            <div className="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
+              {displayPhone && phoneHref && (
+                <a
+                  href={phoneHref}
+                  className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-black/5 transition hover:shadow-md"
+                >
+                  <svg viewBox="0 0 24 24" className="mx-auto mb-3 h-6 w-6 text-[#6F8F72]" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5.5A2.5 2.5 0 015.5 3h1.6a1 1 0 01.96.73l.9 3.15a1 1 0 01-.28 1L7.2 9.36a12.5 12.5 0 007.44 7.44l1.48-1.48a1 1 0 011-.28l3.15.9a1 1 0 01.73.96v1.6a2.5 2.5 0 01-2.5 2.5C10.9 21 3 13.1 3 5.5z" />
+                  </svg>
+                  <span className="block text-sm text-[#5F6C72]">Téléphone</span>
+                  <span className="mt-1 block text-lg text-[#5C3A21] group-hover:underline">
+                    {displayPhone}
+                  </span>
+                </a>
+              )}
+
+              {contactEmail && (
+                <a
+                  href={`mailto:${contactEmail}`}
+                  className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-black/5 transition hover:shadow-md"
+                >
+                  <svg viewBox="0 0 24 24" className="mx-auto mb-3 h-6 w-6 text-[#6F8F72]" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span className="block text-sm text-[#5F6C72]">E-mail</span>
+                  <span className="mt-1 block break-all text-sm text-[#5C3A21] group-hover:underline">
+                    {contactEmail}
+                  </span>
+                </a>
+              )}
+
+              <a
+                href={WORKSHOP_MAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-black/5 transition hover:shadow-md"
+              >
+                <svg viewBox="0 0 24 24" className="mx-auto mb-3 h-6 w-6 text-[#6F8F72]" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 21s7-5.686 7-11a7 7 0 10-14 0c0 5.314 7 11 7 11z" />
+                  <circle cx="12" cy="10" r="2.5" />
+                </svg>
+                <span className="block text-sm text-[#5F6C72]">L&apos;atelier</span>
+                <span className="mt-1 block text-sm text-[#5C3A21] group-hover:underline">
+                  {WORKSHOP_ADDRESS}
+                </span>
+              </a>
+            </div>
           </div>
         </div>
       </section>

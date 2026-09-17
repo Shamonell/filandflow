@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/ui/Logo";
+import { WORKSHOP_ADDRESS, WORKSHOP_MAP_URL } from "@/lib/contact";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -96,7 +97,7 @@ export default function Header() {
         */}
         <div className="mb-1 flex justify-center">
           <a
-            href="https://www.google.com/maps/search/?api=1&query=2500+route+du+Vercors+26120+Chabeuil"
+            href={WORKSHOP_MAP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex items-center gap-1.5 text-xs tracking-wide text-[#5F6C72] transition-colors hover:text-[#6F8F72] md:text-sm"
@@ -116,9 +117,7 @@ export default function Header() {
               />
               <circle cx="12" cy="10" r="2.5" />
             </svg>
-            <span className="group-hover:underline">
-              2500 route du Vercors, 26120 Chabeuil
-            </span>
+            <span className="group-hover:underline">{WORKSHOP_ADDRESS}</span>
           </a>
         </div>
 

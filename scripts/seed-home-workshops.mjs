@@ -15,9 +15,11 @@
  * invisible pour une requête publique. Les annonces créées avec un point
  * n'apparaissaient nulle part sur le site.
  *
- * Les visuels restent ceux de /public via `legacyImagePath` : rien à
- * téléverser, l'affichage est identique à aujourd'hui. Elisabeth peut ensuite
- * remplacer chaque photo par un média Sanity depuis le Studio.
+ * Les documents sont créés SANS photo, volontairement : les fichiers
+ * /public/ateliers-chez-vous/*.jpg référencés à l'origine n'ont jamais existé
+ * dans le dépôt, et ces cartes affichent le dégradé de repli depuis toujours.
+ * Elisabeth dépose la bonne photo sur chacune depuis le Studio ; le champ
+ * image étant obligatoire, le Studio les signale tant que c'est à faire.
  */
 
 import { readFileSync } from "node:fs";
@@ -31,7 +33,6 @@ const WORKSHOPS = [
     title: "Pochette-sac",
     duration: "4h",
     price: 65,
-    legacyImagePath: "/ateliers-chez-vous/texas.jpg",
     sortOrder: 1,
   },
   {
@@ -39,7 +40,6 @@ const WORKSHOPS = [
     title: "Pochette en chutes de tissus avec étiquette brodée",
     duration: "2h30",
     price: 50,
-    legacyImagePath: "/ateliers-chez-vous/pochette-chutes.jpg",
     sortOrder: 2,
   },
   {
@@ -47,7 +47,6 @@ const WORKSHOPS = [
     title: "Housse de coussin patchwork zippée",
     duration: "2h30",
     price: 40,
-    legacyImagePath: "/ateliers-chez-vous/housse-coussin.jpg",
     sortOrder: 3,
   },
   {
@@ -55,7 +54,6 @@ const WORKSHOPS = [
     title: "Besace",
     duration: "4h30",
     price: 65,
-    legacyImagePath: "/ateliers-chez-vous/besace-nelson.jpg",
     sortOrder: 4,
   },
 ];
@@ -105,7 +103,7 @@ console.log(`Documents homeWorkshop déjà présents : ${existing.length}\n`);
 for (const w of WORKSHOPS) {
   const state = existingIds.has(w._id) ? "existe déjà, ignoré" : "à créer";
   console.log(`${state.padEnd(20)} ${w.title}`);
-  console.log(`                     ${w.duration} · ${w.price}€ · ${w.legacyImagePath}`);
+  console.log(`                     ${w.duration} · ${w.price}€ · sans photo`);
 }
 
 const toCreate = WORKSHOPS.filter((w) => !existingIds.has(w._id));
@@ -130,7 +128,6 @@ for (const w of toCreate) {
     slug: { _type: "slug", current: w._id.replace("homeWorkshop-", "") },
     duration: w.duration,
     price: w.price,
-    legacyImagePath: w.legacyImagePath,
     sortOrder: w.sortOrder,
     isActive: true,
   });

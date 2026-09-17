@@ -16,6 +16,13 @@
  * dans le panneau de l'hébergeur ne suffit pas, il faut reconstruire.
  */
 
+/** Adresse de l'atelier, affichée dans l'en-tête et sur la page contact. */
+export const WORKSHOP_ADDRESS = "2500 route du Vercors, 26120 Chabeuil";
+
+/** Lien d'itinéraire vers l'atelier. */
+export const WORKSHOP_MAP_URL =
+  "https://www.google.com/maps/search/?api=1&query=2500+route+du+Vercors+26120+Chabeuil";
+
 /** Valeurs de repli historiques, à traiter comme « non configuré ». */
 const PLACEHOLDERS = new Set(["33600000000", "600000000", "0600000000"]);
 
@@ -63,6 +70,25 @@ export function mailtoLink(subject: string, body: string): string | null {
   const email = getContactEmail();
   if (!email) return null;
   return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/**
+ * Numéro formaté à la française pour l'affichage : 06 47 10 30 28.
+ * Rend `null` si aucun numéro n'est configuré.
+ */
+export function getDisplayPhone(): string | null {
+  const number = getWhatsappNumber();
+  if (!number) return null;
+
+  // 336XXXXXXXX -> 06 XX XX XX XX
+  const national = number.startsWith("33") ? `0${number.slice(2)}` : number;
+  return national.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
+}
+
+/** Lien `tel:` au format international, ou `null` si non configuré. */
+export function telLink(): string | null {
+  const number = getWhatsappNumber();
+  return number ? `tel:+${number}` : null;
 }
 
 /** Lien WhatsApp pré-rempli, ou `null` si aucun numéro n'est configuré. */
