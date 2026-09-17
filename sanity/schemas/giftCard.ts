@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { SLUG_MAX_LENGTH, slugify, slugWarning } from "./slugify";
 
 /**
  * Offre de bon cadeau (prix et texte gérés dans le CMS).
@@ -53,12 +54,14 @@ export default defineType({
       name: "slug",
       title: "Identifiant (slug)",
       type: "slug",
-      options: { source: "title", maxLength: 96 },
+      options: { source: "title", maxLength: SLUG_MAX_LENGTH, slugify },
       description:
         "Ex. carte-cadeau, duo-creatif, pack-decouverte. ⚠️ Utilisé par le paiement en ligne : ne le modifiez plus une fois publié.",
       group: "essentiels",
-      validation: (Rule) =>
+      validation: (Rule) => [
         Rule.required().error("Cliquez sur « Generate » pour créer l'identifiant."),
+        Rule.custom(slugWarning).warning(),
+      ],
     }),
     defineField({
       name: "sortOrder",

@@ -1,4 +1,5 @@
 import { defineType, defineField } from "sanity";
+import { SLUG_MAX_LENGTH, slugify, slugWarning } from "./slugify";
 
 export default defineType({
   name: "product",
@@ -38,13 +39,16 @@ export default defineType({
       type: "slug",
       options: {
         source: "title",
-        maxLength: 96,
+        maxLength: SLUG_MAX_LENGTH,
+        slugify,
       },
       description:
         "Identifiant utilisé dans l'URL (ex. sac-fleuri). Cliquez sur « Generate » après avoir saisi le nom.",
       group: "essentiels",
-      validation: (Rule) =>
+      validation: (Rule) => [
         Rule.required().error("Cliquez sur « Generate » pour créer l'identifiant."),
+        Rule.custom(slugWarning).warning(),
+      ],
     }),
     defineField({
       name: "images",

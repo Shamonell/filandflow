@@ -1,4 +1,5 @@
 import { defineType, defineField } from "sanity";
+import { SLUG_MAX_LENGTH, slugify, slugWarning } from "./slugify";
 
 /**
  * Session d'atelier (une date, un créneau).
@@ -39,7 +40,8 @@ export default defineType({
       title: "Identifiant URL (slug)",
       type: "slug",
       options: {
-        maxLength: 96,
+        maxLength: SLUG_MAX_LENGTH,
+        slugify,
         source: (doc: Record<string, unknown>) => {
           const date = doc.dateStart ? String(doc.dateStart).slice(0, 10) : "session";
           return `atelier-${date}`;
@@ -48,8 +50,10 @@ export default defineType({
       description:
         "Adresse de la page de cette session (ex. couture-15-mars-2026). Cliquez sur « Generate » ou saisissez manuellement. Doit être unique.",
       group: "essentiels",
-      validation: (Rule) =>
+      validation: (Rule) => [
         Rule.required().error("Cliquez sur « Generate » pour créer l'identifiant."),
+        Rule.custom(slugWarning).warning(),
+      ],
     }),
     defineField({
       name: "status",

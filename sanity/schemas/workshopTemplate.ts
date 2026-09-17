@@ -1,4 +1,5 @@
 import { defineType, defineField } from "sanity";
+import { SLUG_MAX_LENGTH, slugify, slugWarning } from "./slugify";
 
 /**
  * Type d'atelier (template réutilisable).
@@ -31,13 +32,16 @@ export default defineType({
       type: "slug",
       options: {
         source: "title",
-        maxLength: 96,
+        maxLength: SLUG_MAX_LENGTH,
+        slugify,
       },
       description:
         "Ex. couture, broderie, macrame. ⚠️ Doit correspondre au chemin du code (ex. /atelier/couture). Ne modifiez pas un slug existant.",
       group: "essentiels",
-      validation: (Rule) =>
+      validation: (Rule) => [
         Rule.required().error("Cliquez sur « Generate » pour créer le slug."),
+        Rule.custom(slugWarning).warning(),
+      ],
     }),
     defineField({
       name: "description",
