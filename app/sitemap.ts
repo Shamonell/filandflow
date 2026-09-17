@@ -1,5 +1,16 @@
 import { MetadataRoute } from "next";
-import { getEvents } from "@/lib/queries";
+import { getEvents, getProducts } from "@/lib/queries";
+
+/** Pages de présentation d'un type d'atelier, définies en dur dans app/atelier/. */
+const WORKSHOP_TYPES = [
+  "couture",
+  "broderie",
+  "macrame",
+  "tissage",
+  "argile",
+  "customisation-meuble",
+  "reparation-upcycling",
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filandflow.fr";
@@ -14,6 +25,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/ateliers`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    },
+    {
+      // La boutique manquait au sitemap : ni elle ni les fiches produit
+      // n'étaient déclarées à Google.
+      url: `${baseUrl}/boutique`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.9,
@@ -56,6 +75,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Pages de présentation par type d'atelier
+  const typePages: MetadataRoute.Sitemap = WORKSHOP_TYPES.map((type) => ({
+    url: `${baseUrl}/atelier/${type}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
   // Pages dynamiques des ateliers
   let eventPages: MetadataRoute.Sitemap = [];
   try {
@@ -67,8 +94,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
   } catch (error) {
-    console.error("Erreur lors de la génération du sitemap:", error);
+    console.error("Erreur lors de la génération du sitemap (ateliers):", error);
   }
 
-  return [...staticPages, ...eventPages];
+  // Fiches produit
+  let productPages: MetadataRoute.Sitemap = [];
+  try {
+    const products = await getProducts();
+    productPages = products.map((product) => ({
+      url: `${baseUrl}/produit/${product.slug.current}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+  } catch (error) {
+    console.error("Erreur lors de la génération du sitemap (produits):", error);
+  }
+
+  return [...staticPages, ...typePages, ...eventPages, ...productPages];
 }

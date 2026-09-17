@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
+import LocalBusinessSchema from "@/components/seo/LocalBusinessSchema";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const playfair = Playfair_Display({
@@ -96,6 +97,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${inter.variable} ${playfair.variable} font-sans`}>
+        <LocalBusinessSchema siteUrl={siteUrl} />
         <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>

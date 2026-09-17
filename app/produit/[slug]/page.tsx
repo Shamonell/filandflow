@@ -81,8 +81,41 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const whatsappUrl = whatsappLink(enquiry);
   const contactUrl = contactFormLink(enquiry);
 
+  // Données structurées : permettent à Google d'afficher le prix et la
+  // disponibilité directement dans les résultats. La disponibilité reflète
+  // le statut réel saisi dans le Studio, jamais une valeur optimiste.
+  const availability =
+    product.status === "disponible"
+      ? "https://schema.org/InStock"
+      : product.status === "vendu"
+        ? "https://schema.org/SoldOut"
+        : "https://schema.org/PreOrder";
+
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    image: photos.map((p) => p.src),
+    ...(typeof product.description === "string" && product.description
+      ? { description: product.description }
+      : {}),
+    brand: { "@type": "Brand", name: "Fil & Flow" },
+    offers: {
+      "@type": "Offer",
+      price: product.price.toFixed(2),
+      priceCurrency: "EUR",
+      availability,
+      itemCondition: "https://schema.org/NewCondition",
+      seller: { "@type": "Organization", name: "Fil & Flow" },
+    },
+  };
+
   return (
     <div className="container mx-auto px-4 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Images */}
         <ProductGallery photos={photos} title={product.title} />
