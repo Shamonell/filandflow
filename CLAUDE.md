@@ -22,6 +22,8 @@ There is no test suite. Validate changes with `npm run build`. The build prerend
 
 The one-off maintenance scripts in `scripts/*.mjs` (e.g. `fix-product-slugs.mjs`) run in dry-run mode by default and only write to Sanity with `--write`. They use `SANITY_API_WRITE_TOKEN`.
 
+**Never run `npm run delete:test-content`** (`scripts/delete-test-content.ts`) unless the user explicitly asks. It has no dry-run mode and no confirmation. It immediately deletes **every** published `product` and `event` in the dataset, which is the live content of filandflow.fr, not only test data.
+
 ## Architecture
 
 **Content (Sanity).** The schemas are in `sanity/schemas/`: `product`, `event`, `workshopTemplate`, `giftCard`, `homeWorkshop`, `announcement`. There are two Studio configs that share these schemas: the root `sanity.config.ts` is the one used by the embedded Studio at `/admin` (`app/admin/[[...index]]`), and `sanity/sanity.config.ts` is for the standalone Studio. All GROQ queries, TS types and fetch helpers are in `lib/queries.ts`. `lib/sanity.ts` is the read client (CDN outside dev) plus `urlFor`. `lib/sanityAdmin.ts` is the write client, used only server-side by the webhook.
@@ -32,7 +34,7 @@ The one-off maintenance scripts in `scripts/*.mjs` (e.g. `fix-product-slugs.mjs`
 
 **Checkout flow.**
 1. `components/checkout/*` modals make the customer pick a payment mode and a delivery mode, then POST `{type: "product"|"gift", slug|giftId, deliveryMode}` to `app/api/checkout/route.ts`.
-2. The route re-fetches the price and availability from Sanity, so it never trusts the client. It validates the delivery mode and builds a Stripe Checkout session. Prices are stored in euros and sent to Stripe as `× 100` (cents). Colissimo collects the shipping address; pickup ("retrait") requires a phone custom field.
+2. The route re-fetches the price and availability from Sanity, so it never trusts the client. It validates the delivery mode and builds a Stripe Checkout session. Prices are stored in euros and sent to Stripe as `× 100` (cents). Products offer `retrait` (pickup, requires a phone custom field) and `colissimo` (collects the shipping address). Gift cards offer `email`, `retrait` (also requires the phone field) and `courrier` (paper card by post, which also collects the address).
 3. `app/api/webhooks/stripe/route.ts` handles `checkout.session.completed`. It sets the product to `vendu` with `setProductStatusBySlug`, which patches both the published doc and any draft. It then emails the seller (`ORDER_EMAIL`, falling back to `CONTACT_EMAIL`) and the customer through Resend.
 
 `lib/deliveryOptions.ts` is the single source of truth for delivery modes and their prices. It is used by the modal, the checkout route and the webhook's email wording. `STRIPE-CONFIG.md` documents the env vars and webhook setup.
