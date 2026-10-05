@@ -44,3 +44,7 @@ sanity/node_modules
 /docs
 
 
+
+# cloudflare (wrangler)
+.wrangler/
+.dev.vars*

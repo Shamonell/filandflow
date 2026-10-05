@@ -16,6 +16,8 @@ npm run build          # next build (the only full check: type-check + lint + pr
 npm run lint           # next lint (next/core-web-vitals)
 npm run sanity         # standalone Studio (cd sanity && npm run dev, on :3333)
 npm run seed:templates # tsx scripts/seed-workshop-templates.ts
+npx wrangler deploy --dry-run --outdir /tmp/wrk   # build the Cloudflare payment worker without deploying
+npx wrangler dev       # run the payment worker locally (secrets in .dev.vars, git-ignored)
 ```
 
 There is no test suite. Validate changes with `npm run build`. The build prerenders pages from live Sanity data, so it needs `.env.local` with the Sanity variables.
@@ -32,10 +34,15 @@ The one-off maintenance scripts in `scripts/*.mjs` (e.g. `fix-product-slugs.mjs`
 
 **Workshops.** A `workshopTemplate` is a type of workshop (couture, broderie, tissage…) and an `event` is a dated session that references a template. Each template has a hand-written route in `app/atelier/<type>/page.tsx`, and all of these routes render the shared `components/atelier/WorkshopTypePage.tsx`. Individual sessions are served by `app/atelier/[slug]`, and the month views by `app/ateliers/[month]`. All date logic must go through `lib/eventParis.ts` (Europe/Paris via date-fns-tz), because the server runs in UTC. `GUIDE-ATELIERS-SANITY.md` explains the editor workflow.
 
-**Checkout flow.**
-1. `components/checkout/*` modals make the customer pick a payment mode and a delivery mode, then POST `{type: "product"|"gift", slug|giftId, deliveryMode}` to `app/api/checkout/route.ts`.
-2. The route re-fetches the price and availability from Sanity, so it never trusts the client. It validates the delivery mode and builds a Stripe Checkout session. Prices are stored in euros and sent to Stripe as `× 100` (cents). Products offer `retrait` (pickup, requires a phone custom field) and `colissimo` (collects the shipping address). Gift cards offer `email`, `retrait` (also requires the phone field) and `courrier` (paper card by post, which also collects the address).
-3. `app/api/webhooks/stripe/route.ts` handles `checkout.session.completed`. It sets the product to `vendu` with `setProductStatusBySlug`, which patches both the published doc and any draft. It then emails the seller (`ORDER_EMAIL`, falling back to `CONTACT_EMAIL`) and the customer through Resend.
+**Checkout flow.** The payment logic lives in `lib/payments/` and works with plain Web `Request`/`Response` objects, with no Next.js dependency. Two deployments use it:
+- the Next routes `app/api/checkout` and `app/api/webhooks/stripe`, which are thin wrappers;
+- a Cloudflare Worker, `filandflow-paiement` (`wrangler.jsonc` at the root, entry `cloudflare/paiement/index.ts`). It serves `POST /checkout` (with CORS for `ALLOWED_ORIGINS`) and `POST /webhooks/stripe`. It reads env through `process.env` thanks to `nodejs_compat`, and Cloudflare Workers Builds deploys it from `main`.
+
+Anything imported by `lib/payments` must stay Worker-compatible: no `next/*`, no `next-sanity`. That is why `lib/payments/catalog.ts` has its own `@sanity/client` reader instead of using `lib/queries.ts`. The webhook must use `constructEventAsync`, because the sync version doesn't work on Workers. The browser picks the endpoint through `checkoutEndpoint()` in `lib/payments/endpoint.ts`: it uses `NEXT_PUBLIC_PAYMENT_API_URL` (the worker URL) when that is set, otherwise `/api/checkout`. Setup steps for the owner are in `cloudflare/GUIDE-CLOUDFLARE.md`.
+
+1. `components/checkout/*` modals make the customer pick a payment mode and a delivery mode, then POST `{type: "product"|"gift", slug|giftId, deliveryMode}` to the checkout endpoint (`lib/payments/checkout.ts`).
+2. The handler re-fetches the price and availability from Sanity, so it never trusts the client. It validates the delivery mode and builds a Stripe Checkout session. Prices are stored in euros and sent to Stripe as `× 100` (cents). Products offer `retrait` (pickup, requires a phone custom field) and `colissimo` (collects the shipping address). Gift cards offer `email`, `retrait` (also requires the phone field) and `courrier` (paper card by post, which also collects the address).
+3. `lib/payments/webhook.ts` handles `checkout.session.completed`. It sets the product to `vendu` with `setProductStatusBySlug`, which patches both the published doc and any draft. It then emails the seller (`ORDER_EMAIL`, falling back to `CONTACT_EMAIL`) and the customer through Resend.
 
 `lib/deliveryOptions.ts` is the single source of truth for delivery modes and their prices. It is used by the modal, the checkout route and the webhook's email wording. `STRIPE-CONFIG.md` documents the env vars and webhook setup.
 
@@ -49,6 +56,6 @@ The one-off maintenance scripts in `scripts/*.mjs` (e.g. `fix-product-slugs.mjs`
 
 - **Slugs.** Sanity only slugifies when an editor clicks "Generate"; a slug typed or pasted by hand is stored as-is. Hand-typed product slugs containing spaces and quotes once made every product page return 404 in production. `sanity/schemas/slugify.ts` provides the shared `slugify` and a Studio warning for such slugs. Use it in every new schema that has a slug field.
 - Product statuses are `disponible | réservé | vendu | en demande`. Only `disponible` can be bought.
-- Environment variables used: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `SANITY_API_WRITE_TOKEN`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `ORDER_EMAIL`, `CONTACT_EMAIL`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_WHATSAPP_NUMBER`, and `NEXT_PUBLIC_SITE_URL` (Stripe redirect URLs; falls back to `VERCEL_URL`). The Stripe and Sanity write clients are created lazily, so a missing key only fails at call time, not at build time.
+- Environment variables used: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `SANITY_API_WRITE_TOKEN`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `ORDER_EMAIL`, `CONTACT_EMAIL`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_WHATSAPP_NUMBER`, `NEXT_PUBLIC_SITE_URL` (Stripe redirect URLs; falls back to `VERCEL_URL`), `NEXT_PUBLIC_PAYMENT_API_URL` (on Vercel, points the front at the worker), and `ALLOWED_ORIGINS` (in the worker). The worker's non-secret vars are in `wrangler.jsonc` (`keep_vars: true`); its secrets are set in the Cloudflare dashboard. The Stripe and Sanity write clients are created lazily, so a missing key only fails at call time, not at build time.
 - Path alias: `@/*` points to the repo root.
 - `out.zip` and `dist/` at the root are old build leftovers committed by mistake. They are not part of the app.

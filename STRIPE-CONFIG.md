@@ -25,6 +25,8 @@ La création de session multiplie par **100** pour obtenir les **centimes** (`un
 
 ## Configurer le webhook Stripe
 
+> La partie paiement peut tourner sur Cloudflare (worker `filandflow-paiement`). Dans ce cas, l'URL du webhook est celle du worker + `/webhooks/stripe` et les clés se mettent dans Cloudflare : voir `cloudflare/GUIDE-CLOUDFLARE.md`.
+
 1. Va sur **https://dashboard.stripe.com/webhooks**
 2. Clique **Add endpoint**
 3. **URL** : `https://filandflow.fr/api/webhooks/stripe` (ou ton domaine)

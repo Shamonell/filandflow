@@ -1,0 +1,23 @@
+// Worker Cloudflare « filandflow-paiement » : la partie Stripe du site.
+// Le site lui-même reste sur Vercel ; voir cloudflare/GUIDE-CLOUDFLARE.md.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "filandflow-paiement",
+  "main": "cloudflare/paiement/index.ts",
+  "compatibility_date": "2026-09-01",
+  // Donne accès à process.env (variables et secrets), comme sur Vercel.
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  // Garde les variables ajoutées depuis le tableau de bord Cloudflare
+  // (ex. NEXT_PUBLIC_SANITY_PROJECT_ID) au lieu de les effacer à chaque déploiement.
+  "keep_vars": true,
+  "observability": { "enabled": true },
+  "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://filandflow.fr",
+    "NEXT_PUBLIC_SANITY_DATASET": "production",
+    "ALLOWED_ORIGINS": "https://filandflow.fr,https://www.filandflow.fr"
+  }
+  // Secrets à ajouter dans le tableau de bord (jamais ici) :
+  // STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SANITY_API_WRITE_TOKEN,
+  // RESEND_API_KEY, ORDER_EMAIL
+}

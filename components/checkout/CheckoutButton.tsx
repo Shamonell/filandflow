@@ -9,6 +9,7 @@ import {
   GIFT_DELIVERY_OPTIONS,
   type DeliveryMode,
 } from "@/lib/deliveryOptions";
+import { checkoutEndpoint } from "@/lib/payments/endpoint";
 
 type CheckoutButtonProps = {
   type: "product" | "gift";
@@ -49,7 +50,7 @@ export default function CheckoutButton({
           ? { type: "product", slug, deliveryMode }
           : { type: "gift", giftId, deliveryMode };
 
-      const res = await fetch("/api/checkout", {
+      const res = await fetch(checkoutEndpoint(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
