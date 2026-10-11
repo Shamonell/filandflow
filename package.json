@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/classer-boutique.mjs --verify",
+    "prebuild": "node -e \"console.error('test volontaire : prebuild bien execute'); process.exit(1)\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
