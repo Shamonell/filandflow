@@ -5,6 +5,7 @@
  *
  *   node scripts/classer-boutique.mjs            # simulation, n'écrit rien
  *   node scripts/classer-boutique.mjs --write    # applique
+ *   node scripts/classer-boutique.mjs --verify   # vérifie seulement ; échoue si impossible
  *   node scripts/classer-boutique.mjs --ci       # utilisé par « prebuild »
  *
  * En mode --ci, le script n'agit que dans un build d'aperçu Vercel
@@ -27,7 +28,8 @@ import { readFileSync } from "node:fs";
 import { createClient } from "@sanity/client";
 
 const CI = process.argv.includes("--ci");
-const WRITE = CI || process.argv.includes("--write");
+const VERIFY = process.argv.includes("--verify");
+const WRITE = !VERIFY && (CI || process.argv.includes("--write"));
 
 if (CI && process.env.VERCEL_ENV !== "preview") {
   console.log(`[classer-boutique] Ignoré (VERCEL_ENV=${process.env.VERCEL_ENV ?? "local"}).`);
@@ -152,7 +154,7 @@ async function readProducts() {
 }
 
 // --- 1 à 3 : écriture ----------------------------------------------------------
-log(`Dataset : ${dataset} · mode ${WRITE ? "écriture" : "simulation"}`);
+log(`Dataset : ${dataset} · mode ${VERIFY ? "vérification" : WRITE ? "écriture" : "simulation"}`);
 const before = await readProducts();
 log(`${before.length} produit(s) trouvé(s) (brouillons regroupés avec leur version publiée).`);
 
@@ -189,7 +191,9 @@ for (const p of before) {
   }
 }
 
-if (WRITE) {
+if (VERIFY) {
+  log("Vérification seule : aucune écriture.");
+} else if (WRITE) {
   const res = await tx.commit();
   log(`${ops} opération(s) appliquée(s). Transaction ${res.transactionId}`);
 } else {

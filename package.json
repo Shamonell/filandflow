@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/classer-boutique.mjs --ci",
+    "prebuild": "node scripts/classer-boutique.mjs --verify",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
