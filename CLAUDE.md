@@ -30,7 +30,7 @@ The one-off maintenance scripts in `scripts/*.mjs` (e.g. `fix-product-slugs.mjs`
 
 ## Architecture
 
-**Content (Sanity).** The schemas are in `sanity/schemas/`: `product`, `event`, `workshopTemplate`, `giftCard`, `homeWorkshop`, `announcement`. There are two Studio configs that share these schemas: the root `sanity.config.ts` is the one used by the embedded Studio at `/admin` (`app/admin/[[...index]]`), and `sanity/sanity.config.ts` is for the standalone Studio. All GROQ queries, TS types and fetch helpers are in `lib/queries.ts`. `lib/sanity.ts` is the read client (CDN outside dev) plus `urlFor`. `lib/sanityAdmin.ts` is the write client, used only server-side by the webhook.
+**Content (Sanity).** The schemas are in `sanity/schemas/`: `product`, `event`, `workshopTemplate`, `giftCard`, `homeWorkshop`, `announcement`. The embedded Studio at `/admin` builds its config in `app/admin/[[...index]]/AdminStudio.tsx`. The root `sanity.config.ts` and `sanity/sanity.config.ts` (standalone Studio) also exist. All three take their types from `schemaTypes` in `sanity/schemas/index.ts`, so a new type only needs to be registered there. All GROQ queries, TS types and fetch helpers are in `lib/queries.ts`. `lib/sanity.ts` is the read client (CDN outside dev) plus `urlFor`. `lib/sanityAdmin.ts` is the write client, used only server-side by the webhook.
 
 **Pages use ISR.** Pages use `export const revalidate = 30|60` and do not use on-demand revalidation, so edits in Sanity show up after that delay.
 
