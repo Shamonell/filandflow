@@ -24,6 +24,8 @@ There is no test suite. Validate changes with `npm run build`. The build prerend
 
 The one-off maintenance scripts in `scripts/*.mjs` (e.g. `fix-product-slugs.mjs`) run in dry-run mode by default and only write to Sanity with `--write`. They use `SANITY_API_WRITE_TOKEN`.
 
+`scripts/classer-boutique.mjs` (`npm run classer:boutique`, dry-run unless you pass `--write`; `--verify` only checks) puts products into the four initial categories based on their title, fixes non-conforming product slugs, and checks the inventory as of 2026-10-11. It never deletes anything. It was run once, on 2026-10-11, through a Vercel preview build.
+
 **Never run `npm run delete:test-content`** (`scripts/delete-test-content.ts`) unless the user explicitly asks. It has no dry-run mode and no confirmation. It immediately deletes **every** published `product` and `event` in the dataset, which is the live content of filandflow.fr, not only test data.
 
 ## Architecture

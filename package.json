@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node -e \"console.error('test volontaire : prebuild bien execute'); process.exit(1)\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -12,7 +11,8 @@
     "sanity:build": "cd sanity && npm run build",
     "sanity:deploy": "cd sanity && npm run deploy",
     "seed:templates": "npx tsx scripts/seed-workshop-templates.ts",
-    "delete:test-content": "npx tsx scripts/delete-test-content.ts"
+    "delete:test-content": "npx tsx scripts/delete-test-content.ts",
+    "classer:boutique": "node scripts/classer-boutique.mjs"
   },
   "dependencies": {
     "@sanity/client": "^6.12.0",
