@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { getEvents, getProducts } from "@/lib/queries";
+import { getShopData } from "@/lib/shop";
 
 /** Pages de présentation d'un type d'atelier, définies en dur dans app/atelier/. */
 const WORKSHOP_TYPES = [
@@ -111,5 +112,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Erreur lors de la génération du sitemap (produits):", error);
   }
 
-  return [...staticPages, ...typePages, ...eventPages, ...productPages];
+  // Rubriques de la boutique (seulement celles qui ont des pièces disponibles)
+  let categoryPages: MetadataRoute.Sitemap = [];
+  try {
+    const { categories } = await getShopData();
+    categoryPages = categories
+      .filter((c) => c.available > 0)
+      .map((c) => ({
+        url: `${baseUrl}/boutique/${c.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      }));
+  } catch (error) {
+    console.error("Erreur lors de la génération du sitemap (rubriques):", error);
+  }
+
+  return [...staticPages, ...typePages, ...categoryPages, ...eventPages, ...productPages];
 }
