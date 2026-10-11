@@ -46,6 +46,13 @@ Anything imported by `lib/payments` must stay Worker-compatible: no `next/*`, no
 
 `lib/deliveryOptions.ts` is the single source of truth for delivery modes and their prices. It is used by the modal, the checkout route and the webhook's email wording. `STRIPE-CONFIG.md` documents the env vars and webhook setup.
 
+**Shop categories ("rubriques").** The `shopCategory` documents have a title, an optional `word` (a short note shown with Elisabeth's portrait) and a `sortOrder`. They have no slug field: `lib/shop.ts` derives the URL slug from the title with `slugify`, so renaming a category changes its URL. `product.category` is a required reference that uses a custom input, `sanity/components/CategoryInput.tsx`. It shows radio buttons plus a "+ Nouvelle rubrique" button, which creates a published `shopCategory` inline and selects it. `getShopData()` precomputes image URLs on the server, and `components/boutique/ShopBrowser.tsx` (a client component) renders:
+- the category tags; a category with no unsold product is hidden;
+- the sort control and the "pièces adoptées" toggle (sold items are hidden by default);
+- the "Nouveau" badge, shown for 21 days.
+
+`/boutique/[rubrique]` renders the same view with that category preselected. Switching categories uses `history.pushState`, not a navigation. Products without a category only appear under "Tout voir".
+
 **Gift cards** load from Sanity and fall back to the hardcoded offers in `lib/gift-cards.ts` when Sanity is empty or errors.
 
 **Contact.** `app/api/contact/route.ts` sends the email through Resend and has anti-bot checks (a honeypot, a minimum fill time, and a limit on the number of links). Contact details, the workshop address and the WhatsApp/mailto helpers are in `lib/contact.ts`.

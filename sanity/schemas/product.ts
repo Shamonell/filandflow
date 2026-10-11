@@ -1,5 +1,6 @@
 import { defineType, defineField } from "sanity";
 import { SLUG_MAX_LENGTH, slugify, slugWarning } from "./slugify";
+import CategoryInput from "../components/CategoryInput";
 
 export default defineType({
   name: "product",
@@ -20,6 +21,20 @@ export default defineType({
       group: "essentiels",
       validation: (Rule) =>
         Rule.required().error("Le nom du produit est obligatoire."),
+    }),
+    defineField({
+      name: "category",
+      title: "Rubrique",
+      type: "reference",
+      to: [{ type: "shopCategory" }],
+      description:
+        "Où la pièce apparaît dans la boutique. Vous pourrez la changer à tout moment. Le dernier bouton crée une nouvelle rubrique.",
+      group: "essentiels",
+      components: { input: CategoryInput },
+      validation: (Rule) =>
+        Rule.required().error(
+          "Choisissez une rubrique pour ranger la pièce dans la boutique."
+        ),
     }),
     defineField({
       name: "price",
@@ -96,14 +111,15 @@ export default defineType({
       media: "images.0",
       status: "status",
       price: "price",
+      category: "category.title",
     },
-    prepare({ title, media, status, price }) {
+    prepare({ title, media, status, price, category }) {
       const priceLabel =
         typeof price === "number" ? `${price.toFixed(2)} €` : "Prix non renseigné";
       return {
         title: title || "Sans titre",
         media,
-        subtitle: `${priceLabel} — ${status ?? "?"}`,
+        subtitle: `${priceLabel} — ${status ?? "?"}${category ? ` — ${category}` : ""}`,
       };
     },
   },

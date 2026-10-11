@@ -8,12 +8,14 @@ import { HOME_WORKSHOPS_FALLBACK, type HomeWorkshop } from "./home-workshops";
 export const productsQuery = groq`
   *[_type == "product" && !(_id in path("drafts.**"))] | order(_createdAt desc) {
     _id,
+    _createdAt,
     title,
     slug,
     price,
     images,
     description,
-    status
+    status,
+    "category": category->{ _id, title }
   }
 `;
 
@@ -149,12 +151,38 @@ export const giftCardBySlugQuery = groq`
 // Types
 export interface Product {
   _id: string;
+  /** Présent dans productsQuery (liste boutique), absent de productBySlugQuery. */
+  _createdAt?: string;
   title: string;
   slug: { current: string };
   price: number;
   images: any[];
   description: any;
   status: "disponible" | "en demande" | "réservé" | "vendu";
+  /** Rubrique de la boutique, présente dans productsQuery uniquement. */
+  category?: { _id: string; title: string } | null;
+}
+
+/** Rubrique de la boutique (type Sanity « shopCategory »). */
+export interface ShopCategoryDoc {
+  _id: string;
+  title: string;
+  word?: string | null;
+  sortOrder?: number | null;
+}
+
+export const shopCategoriesQuery = groq`
+  *[_type == "shopCategory" && !(_id in path("drafts.**"))]
+    | order(coalesce(sortOrder, 999) asc, title asc) {
+    _id,
+    title,
+    word,
+    sortOrder
+  }
+`;
+
+export async function getShopCategories(): Promise<ShopCategoryDoc[]> {
+  return await client.fetch(shopCategoriesQuery);
 }
 
 export interface WorkshopTemplate {
